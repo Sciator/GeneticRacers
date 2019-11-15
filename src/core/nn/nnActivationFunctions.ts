@@ -1,6 +1,7 @@
 import { IFunctionReal } from "../types";
 
 
+// todo: komentář k enumu
 export enum IANNActivationFunctionType { sigmoid = "sigmoid", tanh = "tanh", relu = "relu" }
 /** function definitions for nn */
 export type IANNActivationFunction = {
@@ -19,7 +20,7 @@ export const relu = (x: number) => x < 0 ? 0 : x;
 export const tanh = (x: number) => Math.tanh(x);
 
 
-export const createExecutableFnc = (aFnc: IANNActivationFunction):IFunctionReal =>{
+export const createExecutableFnc = (aFnc: IANNActivationFunction): IFunctionReal => {
   switch (aFnc.type) {
     case IANNActivationFunctionType.relu: return relu;
     case IANNActivationFunctionType.sigmoid: return sigmoid;
