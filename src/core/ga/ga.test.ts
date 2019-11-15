@@ -1,5 +1,5 @@
 import { range } from './../common';
-import { GA, IAGAInitArgs, IAGAEvaluator } from './ga';
+import { GeneticAlgorithm, IAGAInitArgs, IAGAEvaluator } from './ga';
 import Jest from 'jest';
 import * as math from 'mathjs';
 import { IASelectionFunctionType } from './gaProcesGenerationFunction';
@@ -50,9 +50,9 @@ describe("Genetic algorithm", () => {
       }
     };
 
-    let gaData = GA.gaCreateData(gaInit);
+    let gaData = GeneticAlgorithm.gaCreateData(gaInit);
 
-    const evaluator = GA.createGAEvaluator(gaEvaluator);
+    const evaluator = GeneticAlgorithm.createGAEvaluator(gaEvaluator);
 
     range(100).forEach(() => {
       gaData = evaluator(gaData);

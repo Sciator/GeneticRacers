@@ -14,7 +14,7 @@ describe("neural net", () => {
         }
 
         const nn = NeuralNet.nnCreate(nnparamsTsst);
-        const predict = NeuralNet.predicter(nn);
+        const predict = NeuralNet.nnPredicter(nn);
         const a = predict(range(y).map(() => random(-1, 1)));
       })
     })

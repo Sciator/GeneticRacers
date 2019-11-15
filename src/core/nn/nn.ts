@@ -63,7 +63,7 @@ export abstract class NeuralNet {
   }
 
   /** creates predict function for given nn */
-  public static predicter(nndata: IANNData): (x: number[]) => number[] {
+  public static nnPredicter(nndata: IANNData): (x: number[]) => number[] {
     const hidden = createExecutableFnc(nndata.afunction.hidden);
     const output = createExecutableFnc(nndata.afunction.output);
 
