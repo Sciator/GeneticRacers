@@ -1,4 +1,4 @@
-import { IANNActivationFunction, IANNActivationFunctionType, createExecutableFnc } from './activationFunctions';
+import { IANNActivationFunction, IANNActivationFunctionType, createExecutableFnc } from './nnActivationFunctions';
 import * as math from 'mathjs';
 import { random } from 'mathjs';
 import { range } from '../common';
@@ -10,7 +10,7 @@ export type IANNInitParams = {
     hiddens: number[],
     output: number
   },
-  functions?: {
+  afunction?: {
     hidden: IANNActivationFunction,
     output: IANNActivationFunction,
   }
@@ -22,10 +22,10 @@ export type IANNDataValues = {
   biases: number[][],
 }
 
-/** full nn with activation functions */
+/** full nn with activation afunction */
 export type IANNData = {
   values: IANNDataValues,
-  functions: {
+  afunction: {
     hidden: IANNActivationFunction,
     output: IANNActivationFunction,
   }
@@ -38,14 +38,14 @@ export abstract class NeuralNet {
   public static nnCreate(nnInitParams: IANNInitParams): IANNData {
     const out = {
       values: { biases: [], weights: [] },
-      functions: {
+      afunction: {
         hidden: { type: IANNActivationFunctionType.tanh },
         output: { type: IANNActivationFunctionType.sigmoid },
       }
     } as IANNData;
 
-    if (nnInitParams.functions) {
-      out.functions = nnInitParams.functions;
+    if (nnInitParams.afunction) {
+      out.afunction = nnInitParams.afunction;
     }
 
     const { hiddens, input, output } = nnInitParams.layerScheme;
@@ -64,8 +64,8 @@ export abstract class NeuralNet {
 
   /** creates predict function for given nn */
   public static predicter(nndata: IANNData): (x: number[]) => number[] {
-    const hidden = createExecutableFnc(nndata.functions.hidden);
-    const output = createExecutableFnc(nndata.functions.output);
+    const hidden = createExecutableFnc(nndata.afunction.hidden);
+    const output = createExecutableFnc(nndata.afunction.output);
 
     return (input: number[]) => {
       let current = [input];
