@@ -45,7 +45,7 @@ export function sortMostFitFirst<DNA>(pop: IAGADataPopulation<DNA>) {
   const cpy = [...pop]; cpy.sort(({ fitness: a }, { fitness: b }) => -(a - b)); return cpy;
 }
 
-export abstract class GA {
+export abstract class GeneticAlgorithm {
   /** function for create initial random DNAs */
   public static gaCreateData<DNA>(ainitArgs: IAGAInitArgs<DNA>): IAGAData<DNA> {
     const { _function: { environment, init }, popSize } = ainitArgs;
