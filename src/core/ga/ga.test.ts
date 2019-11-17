@@ -1,6 +1,6 @@
 import { range } from './../common';
 import { GeneticAlgorithm, IAGAInitArgs, IAGAEvaluator } from './ga';
-import Jest from 'jest';
+import jest from 'jest';
 import * as math from 'mathjs';
 import { IASelectionFunctionType } from './gaProcesGenerationFunction';
 
@@ -58,7 +58,7 @@ describe("Genetic algorithm", () => {
       gaData = evaluator(gaData);
     })
 
-    expect(gaData.population[0].dna).toBe(text);
+    expect(gaData[0].dna).toBe(text);
   });
 
   //todo: breed multiple together test

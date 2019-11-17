@@ -1,5 +1,5 @@
 import { range } from './../common';
-import { IAGAData, IAGADataPopulation } from './ga';
+import { IAGADataPopulation } from './ga';
 import * as math from 'mathjs';
 
 export type IBreedFunction<DNA> = (dna: DNA[], mutationRate: number) => DNA;
@@ -45,6 +45,9 @@ const createExecutableFnc = (aFnc: IAProcessGenerationFunction) => {
   const { breedingParents, selection } = aFnc;
   const canBreedSelf = aFnc.canBreedSelf || false;
 
+  if (canBreedSelf)
+    throw new Error("canBreedSelf not implemented");
+
   return <DNA>(breedFnc: IBreedFunction<DNA>) => {
 
     return (pop: IAGADataPopulation<DNA>) => {
@@ -54,9 +57,8 @@ const createExecutableFnc = (aFnc: IAProcessGenerationFunction) => {
 
       return range(popLen).map(() => {
         const selected =
-          (canBreedSelf
-            ? range(breedingParents).map(() => math.pickRandom(range(breedingParents)) as number)
-            : math.pickRandom(range(breedingParents), breedingParents) as number[])
+          range(breedingParents)
+            .map(() => math.randomInt(0, preparedForBreeding.length))
             .map(x => preparedForBreeding[x])
           ;
 
