@@ -1,4 +1,4 @@
-import { range } from './../common';
+import { range } from '../../common';
 import { GeneticAlgorithm, IAGAInitArgs, IAGAEvaluator } from './ga';
 import jest from 'jest';
 import * as math from 'mathjs';
@@ -54,7 +54,7 @@ describe("Genetic algorithm", () => {
 
     const evaluator = GeneticAlgorithm.createGAEvaluator(gaEvaluator);
 
-    range(100).forEach(() => {
+    range(200).forEach(() => {
       gaData = evaluator(gaData);
     })
 

@@ -1,4 +1,4 @@
-import { range } from './../common';
+import { range } from '../../common';
 import { IAGADataPopulation } from './ga';
 import * as math from 'mathjs';
 
@@ -38,8 +38,6 @@ export function createExecutableFncSelection<DNA>(aargs: IASelectionFunction): I
     default: throw new Error("invalid type");
   }
 };
-
-
 
 const createExecutableFnc = (aFnc: IAProcessGenerationFunction) => {
   const { breedingParents, selection } = aFnc;

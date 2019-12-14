@@ -1,6 +1,6 @@
 import createExecutableFnc from './gaProcesGenerationFunction';
 import { IAProcessGenerationFunction, IBreedFunction } from './gaProcesGenerationFunction';
-import { range } from './../common';
+import { range } from '../../common';
 import { type } from "os";
 
 /** function for create initial population */

@@ -1,11 +1,11 @@
 import { range, zip } from './../core/common';
-import { IBreedFunction, IAProcessGenerationFunction, IASelectionFunctionType } from './../core/ga/gaProcesGenerationFunction';
-import { IAGAEvaluator } from './../core/ga/ga';
+import { IBreedFunction, IAProcessGenerationFunction, IASelectionFunctionType } from '../core/AI/ga/gaProcesGenerationFunction';
+import { IAGAEvaluator } from '../core/AI/ga/ga';
 import Jest from 'jest';
 
-import { IANNData } from '../core/nn/nn';
-import { IANNInitParams, NeuralNet } from '../core/nn/nn';
-import { GeneticAlgorithm } from '../core/ga/ga';
+import { IANNData } from '../core/AI/nn/nn';
+import { IANNInitParams, NeuralNet } from '../core/AI/nn/nn';
+import { GeneticAlgorithm } from '../core/AI/ga/ga';
 import { number } from 'prop-types';
 import * as math from 'mathjs';
 

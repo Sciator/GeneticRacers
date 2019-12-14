@@ -1,7 +1,7 @@
 import { random } from 'mathjs';
 import Jest from 'jest';
 
-import { range } from './../common';
+import { range } from '../../common';
 import { NeuralNet, IANNInitParams } from './nn';
 
 

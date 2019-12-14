@@ -1,4 +1,4 @@
-import { IFunctionReal } from "../types";
+import { IFunctionReal } from "../../types";
 
 
 // todo: komentář k enumu

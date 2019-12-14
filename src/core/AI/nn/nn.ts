@@ -1,7 +1,7 @@
 import { IANNActivationFunction, IANNActivationFunctionType, createExecutableFnc } from './nnActivationFunctions';
 import * as math from 'mathjs';
 import { random } from 'mathjs';
-import { range } from '../common';
+import { range } from '../../common';
 
 /** layer scheme for creating new nn */
 export type IANNInitParams = {
