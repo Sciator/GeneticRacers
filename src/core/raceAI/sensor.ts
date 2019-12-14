@@ -1,6 +1,6 @@
-import { Track } from "./track";
+import { Track } from "../race/track";
 import { Point, Line } from "../types";
-import { ICarState } from "./car";
+import { ICarState } from "../race/car";
 
 export type ISensorCalculationResult = {
   sensorLine: Line,

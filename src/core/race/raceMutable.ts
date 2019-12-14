@@ -1,7 +1,7 @@
 import { ITrack } from "./track";
 import { ICarState, IFCarEnvironment, createCarEnvironment, ICarPhysicsOptions } from "./car";
 import { Point } from "../types";
-import { ISensorCalculationResult, calculateSensorDetection } from "./sensor";
+import { ISensorCalculationResult, calculateSensorDetection } from "../raceAI/sensor";
 
 const collisionDist = 5;
 const checkpointDist = 20;

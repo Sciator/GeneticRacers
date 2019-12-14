@@ -1,8 +1,6 @@
 import { ITrack } from "./track";
 import { ICarState, IFCarEnvironment, createCarEnvironment, ICarPhysicsOptions, ICarInputs, carInputsSetter } from "./car";
 import { Point } from "../types";
-import { ISensorCalculationResult, calculateSensorDetection } from "./sensor";
-import { range, zip } from "../common";
 
 const collisionMinDist = 5;
 const checkpointMinDist = 20;
