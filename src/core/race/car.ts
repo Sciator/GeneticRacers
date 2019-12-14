@@ -1,7 +1,7 @@
 import { Point } from "../types";
 //source: https://github.com/chipbell4/car-physics
 
-const BEST_TURN_SPEED = 0.75;
+const BEST_TURN_SPEED = 0.3;
 const TURN_AT_TOP_SPEED = 0.75;
 
 export type ICarPhysicsOptions = {

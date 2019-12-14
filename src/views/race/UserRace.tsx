@@ -67,7 +67,10 @@ export const UserRace: React.FC<IProps> = () => {
       <br/>
       {JSON.stringify(race.cars[0].carState.pos)}
       <br/>
-      {JSON.stringify(race.cars[0].collided)}
+      {JSON.stringify(race.cars[0].raceState)}
+      <br/>
+      {JSON.stringify(race.cars[0].currentCheckpointDist)}
+      {JSON.stringify(race.cars[0].currentCheckpoint)}
       <br/>
       {JSON.stringify(race.cars[0].sensors && race.cars[0].sensors.calcResults && race.cars[0].sensors.calcResults[0].minLength)}
     </div>
