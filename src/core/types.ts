@@ -2,7 +2,7 @@ import { range } from "./common";
 
 const calcPrecisionComparisonLine = 8;
 
-export type IFunctionReal = (x: number) => number;
+export type IFReal = (x: number) => number;
 
 
 export type IPoint = { readonly x: number, readonly y: number };

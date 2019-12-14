@@ -34,6 +34,7 @@ export type IAGAEvaluator<DNA> = {
   }
 }
 
+/** creates sorted copy of DNA array */
 export function sortMostFitFirst<DNA>(pop: IAGADataPopulation<DNA>) {
   const cpy = [...pop]; cpy.sort(({ fitness: a }, { fitness: b }) => -(a - b)); return cpy;
 }

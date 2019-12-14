@@ -36,14 +36,16 @@ type ICarStateMutable = {
   engineOn: boolean,
 }
 
-export type ICarEnvironment = (car: ICarState, dt: number) => ICarState;
+export type IFCarEnvironment = (car: ICarState, dt: number) => ICarState;
 
 const carStateMutableCopy = (car: ICarState) => ({ ...car });
 
-export const setCarInputs = (car: ICarState, engineOn: boolean, turnDirection: "left" | "right" | ""): ICarState =>
+export type ICarInputs = { engineOn: boolean, turnDirection: "left" | "right" | "" };
+
+export const carInputsSetter = (car: ICarState, { engineOn, turnDirection }: ICarInputs): ICarState =>
   ({ ...car, engineOn, turnDirection: (turnDirection === "left" ? -1 : (turnDirection === "right" ? 1 : 0)) });
 
-export const createCarEnvironment = (opt?: ICarPhysicsOptions): ICarEnvironment => {
+export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment => {
   const { acceleration, friction, handling, topSpeed, traction } = { ...defaultCarPhysicsOptions, ...(opt || {}) };
 
   const updateTurn = (car: ICarStateMutable, dt: number) => {

@@ -1,4 +1,4 @@
-import { IFunctionReal } from "../../types";
+import { IFReal } from "../../types";
 
 
 // todo: komentář k enumu
@@ -20,7 +20,7 @@ export const relu = (x: number) => x < 0 ? 0 : x;
 export const tanh = (x: number) => Math.tanh(x);
 
 
-export const createExecutableFnc = (aFnc: IANNActivationFunction): IFunctionReal => {
+export const createExecutableFnc = (aFnc: IANNActivationFunction): IFReal => {
   switch (aFnc.type) {
     case IANNActivationFunctionType.relu: return relu;
     case IANNActivationFunctionType.sigmoid: return sigmoid;

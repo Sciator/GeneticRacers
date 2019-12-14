@@ -1,6 +1,5 @@
 import React from 'react';
 import { colors, CardHeader } from '@material-ui/core';
-import { Position } from '../../core/geometry/types';
 import RCar from './Car';
 import { ITrack } from '../../core/race/track';
 import { RPolygon } from '../../components/svg/RPolygon';

@@ -1,12 +1,12 @@
 import { ITrack } from "./track";
-import { ICarState, ICarEnvironment, createCarEnvironment, ICarPhysicsOptions } from "./car";
+import { ICarState, IFCarEnvironment, createCarEnvironment, ICarPhysicsOptions } from "./car";
 import { Point } from "../types";
-import { ISensorCalculationResult, calculateSenzorDetection } from "./sensor";
+import { ISensorCalculationResult, calculateSensorDetection } from "./sensor";
 
 const collisionDist = 5;
 const checkpointDist = 20;
 
-export type IGeneticRaceState = {
+export type IMCarRaceState = {
   carState: ICarState,
   currentCheckpointDist: number,
   currentCheckpoint: number,
@@ -17,10 +17,10 @@ export type IGeneticRaceState = {
   }
 }
 
-export class Race {
+export class MRace {
   track: ITrack;
-  cars: IGeneticRaceState[];
-  carEnvironment: ICarEnvironment;
+  cars: IMCarRaceState[];
+  carEnvironment: IFCarEnvironment;
 
   public calculateCheckpoint() {
     const { cars, track: { checkpoints } } = this;
@@ -64,7 +64,7 @@ export class Race {
       .forEach(car => {
         car.carState = carEnvironment(car.carState, dt);
         if (car.sensors) {
-          car.sensors.calcResults = calculateSenzorDetection(track)(car.sensors.points)(car.carState);
+          car.sensors.calcResults = calculateSensorDetection(track)(car.sensors.points)(car.carState);
         }
       })
   }

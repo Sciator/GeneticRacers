@@ -1,6 +1,6 @@
 import React from 'react';
 import { RSvgContainer } from '../../components/svg/RSvgContainer';
-import { MRace, ICarRaceState } from '../../core/race/race';
+import { MRace, IMCarRaceState } from '../../core/race/raceMutable';
 import RTrack from './Track';
 import RCar from './Car';
 import { ICarState } from '../../core/race/car';
@@ -14,7 +14,7 @@ const RRace: React.FC<IProps> = ({ children: race }) => {
   return <>
     <RSvgContainer>
       <RTrack>{track}</RTrack>
-      {cars.map((car: ICarRaceState) => (<RCar sensors={car.sensors && car.sensors.calcResults}>{car.carState}</RCar>))}
+      {cars.map((car: IMCarRaceState) => (<RCar sensors={car.sensors && car.sensors.calcResults}>{car.carState}</RCar>))}
     </RSvgContainer>
   </>
 }
