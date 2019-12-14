@@ -1,12 +1,12 @@
 import React from 'react';
 import { RSvgContainer } from '../../components/svg/RSvgContainer';
-import { Race, ICarRaceState } from '../../core/race/race';
+import { MRace, ICarRaceState } from '../../core/race/race';
 import RTrack from './Track';
 import RCar from './Car';
 import { ICarState } from '../../core/race/car';
 
 type IProps = {
-  children: Race
+  children: MRace
 };
 
 const RRace: React.FC<IProps> = ({ children: race }) => {

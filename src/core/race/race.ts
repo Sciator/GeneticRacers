@@ -17,7 +17,7 @@ export type ICarRaceState = {
   }
 }
 
-export class Race {
+export class MRace {
   track: ITrack;
   cars: ICarRaceState[];
   carEnvironment: ICarEnvironment;

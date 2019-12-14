@@ -1,6 +1,6 @@
 import React from 'react';
 import { keyState } from '../../core/Keys';
-import { Race } from '../../core/race/race';
+import { MRace } from '../../core/race/race';
 import track01 from '../../core/race/testingTracks/track01';
 import { Point } from '../../core/types';
 import { Track } from '../../core/race/track';
@@ -13,7 +13,7 @@ type IProps = {
 }
 const track = new Track(track01);
 
-const race: Race = new Race(track,
+const race: MRace = new MRace(track,
   [{ engineOn: false, heading: new Point({ x: 0, y: -1 }), pos: track01.checkpoints[0], turnDirection: 0, velocity: new Point({ x: 0, y: 0 }) }],
   { acceleration: 300 });
 

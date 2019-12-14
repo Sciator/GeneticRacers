@@ -23,7 +23,7 @@ export type IMGARunner<DNA> = {
   gaProcessFunction: IAProcessGenerationFunction,
 };
 
-export class GARunner<DNA> {
+export class MGARunner<DNA> {
   public data: IMGARunner<DNA>;
   public _functions: IAGAExternalFunctions<DNA>;
 
