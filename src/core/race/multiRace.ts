@@ -17,12 +17,14 @@ export type IRaceCarState = {
 
 export type IRaceState = {
   readonly track: ITrack;
-  readonly car: IRaceCarState;
+  readonly cars: IRaceCarState[];
 }
 
 export type IRaceInit = {
   readonly track: ITrack;
+  readonly numOfCars: number;
 }
+
 
 export const calculateCheckpointDistance = (checkpoints: Point[]) => (car: IRaceCarState) => {
   const { currentCheckpoint, carState: { pos } } = car;
@@ -33,22 +35,25 @@ export const calculateCheckpointDistance = (checkpoints: Point[]) => (car: IRace
   return checkpoints[ci].distance(pos);
 }
 
-export const raceInit = ({ track }: IRaceInit): IRaceState => ({
-  track,
-  car: {
-    currentCheckpoint: 1,
-    raceState: ERaceCarRaceState.racing,
-    carState: {
-      heading: new Point({ x: 0, y: -1 }),
-      pos: track.checkpoints[0],
-      velocity: new Point({ x: 0, y: 0 }),
 
-      engineOn: false,
-      turnDirection: 0,
-    }
-  },
-});
 
+export const raceInit = ({ numOfCars, track }: IRaceInit): IRaceState => {
+  const cars = range(numOfCars).map(() =>
+    ({
+      currentCheckpoint: 1,
+      raceState: ERaceCarRaceState.racing,
+      carState: {
+        heading: new Point({ x: 0, y: -1 }),
+        pos: track.checkpoints[0],
+        velocity: new Point({ x: 0, y: 0 }),
+
+        engineOn: false,
+        turnDirection: 0,
+      }
+    } as IRaceCarState));
+
+  return { cars, track }
+}
 
 export const raceEvaluator = (carEnv: IFCarEnvironment) => (state: IRaceState, dt: number) => {
   const { track: { road: { lines: roads } } } = state;
@@ -65,7 +70,7 @@ export const raceEvaluator = (carEnv: IFCarEnvironment) => (state: IRaceState, d
     return false;
   }
 
-  const car = (car => {
+  const cars = state.cars.map(car => {
     if (car.raceState !== ERaceCarRaceState.racing)
       return car;
 
@@ -83,16 +88,21 @@ export const raceEvaluator = (carEnv: IFCarEnvironment) => (state: IRaceState, d
       ;
 
     return { carState, currentCheckpoint, raceState } as IRaceCarState;
-  })(state.car);
+  })
 
   const newState: IRaceState = {
     track: state.track,
-    car
+    cars
   }
 }
 
 
-export const raceInputSetter = (state: IRaceState, inputs: ICarInputs): IRaceState => ({
-  track: state.track,
-  car: { ...state.car, carState: carInputsSetter(state.car.carState, inputs), }
-});
+export const raceInputSetter = (state: IRaceState, inputs: ICarInputs[]): IRaceState => {
+  const { track } = state;
+  const cars = zip(state.cars, inputs).map(([car, input]) =>
+    ({ ...car, carState: carInputsSetter(car.carState, input), })
+  );
+  return {
+    cars, track
+  }
+}

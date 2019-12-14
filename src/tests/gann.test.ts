@@ -108,8 +108,9 @@ export const _TestGANN = () => {
   };
 
   console.time("measure finding simple binary funciton")
-
-  for (let i = 0; i < numberOfGenerations; i++) {
+  
+  let i = 0
+  for (; i < numberOfGenerations; i++) {
     gaData = evaluator(gaData);
     if (compareResults(evalBest()))
       break;
@@ -119,6 +120,7 @@ export const _TestGANN = () => {
 
   const resultRounded = evalBest();
   expect(resultRounded).toEqual(output);
+  console.log(`generation ${i}`);
 };
 
 describe("gann", () => {
