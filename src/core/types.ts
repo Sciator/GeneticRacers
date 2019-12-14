@@ -70,6 +70,44 @@ export class Line {
   public readonly p1: Point;
   public readonly p2: Point;
 
+  public distanceFromPoint(p: Point) {
+    const { p1: { x: x1, y: y1 }, p2: { x: x2, y: y2 } } = this;
+    const { x, y } = p;
+
+    const a = x - x1;
+    const b = y - y1;
+    const c = x2 - x1;
+    const d = y2 - y1;
+
+    const dot = a * c + b * d;
+    const lenSq = c * c + d * d;
+
+    const param = (lenSq != 0) ? dot / lenSq : -1;
+
+    const { xx, yy } = (() => {
+      if (param < 0) {
+        return {
+          xx: x1,
+          yy: y1
+        }
+      }
+      else if (param > 1) {
+        return {
+          xx: x2,
+          yy: y2,
+        }
+      }
+      else {
+        return {
+          xx: x1 + param * c,
+          yy: y1 + param * d,
+        }
+      }
+    })();
+
+    return Math.sqrt(((x - xx) ** 2) + ((y - yy) ** 2));
+  }
+
   public Intersection(other: Line): Point | undefined {
     const { p1, p2 } = this;
     const { p1: p1o, p2: p2o } = other;
