@@ -42,7 +42,7 @@ describe("Genetic algorithm", () => {
         },
         mutationRate: .1,
         breedingParents: 1,
-        canBreedSelf: true,
+        canBreedSelf: false,
       },
       _function: {
         environment: _env,

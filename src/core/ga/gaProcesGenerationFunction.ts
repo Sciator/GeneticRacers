@@ -16,7 +16,7 @@ export type IAProcessGenerationFunction = {
 })
   ;
 
-export enum IASelectionFunctionType { "percent", "fixed" } //, "differenceFromBest" ?
+export enum IASelectionFunctionType { percent, fixed } //, "differenceFromBest" ?
 export type IASelectionFunction = {
   type: IASelectionFunctionType,
   value: number,

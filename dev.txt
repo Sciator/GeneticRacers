@@ -1,0 +1,62 @@
+projít
+https://www.youtube.com/results?search_query=neuroevolution
+
+
+GA <-> ENV
+GA inti -> ENV
+ENV fitness -> GA
+
+
+
+
+
+u aut zkusit přístup nejdřív naučit a pak změnit parametry auta a učit pak dál vs učit se změněnými parametry přímo 
+(vytváření scénářů ?)
+např.
+ vytvoř auto s 3 senzory
+ uč 200 generací
+ přidej 2 senzory
+
+
+Coding Challenge #100.1: Neuroevolution Flappy Bird - Part 1
+https://www.youtube.com/watch?v=c6y21FkaUqw
+https://github.com/CodingTrain/Toy-Neural-Network-JS/tree/master/examples/neuroevolution-flappybird
+
+
+
+Live Stream #178: Neuroevolution Steering Vehicles
+https://www.youtube.com/watch?v=mXDrH0wStHs
+
+
+Coding Challenge #29: Smart Rockets in p5.js
+https://youtu.be/bGz7mv2vD6g
+
+
+
+Coding Challenge #35.4: Traveling Salesperson with Genetic Algorithm
+https://youtu.be/M3KTWnTrU_c
+
+
+
+Deep Learning Cars
+https://www.youtube.com/watch?v=Aut32pR5PQA
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Neural net
+https://github.com/CodingTrain/website/blob/474921318e468be7d7684b4150b5eb53792f3dc3/CodingChallenges/CC_092_xor/P5/libraries/nn.js#L3
+
