@@ -4,17 +4,18 @@ import { MRace, IMCarRaceState } from '../../core/race/raceMutable';
 import RTrack from './Track';
 import RCar from './Car';
 import { ICarState } from '../../core/race/car';
+import { IRaceState, IRaceCarState } from '../../core/race/race';
 
 type IProps = {
-  children: MRace
+  children: IRaceState
 };
 
 const RRace: React.FC<IProps> = ({ children: race }) => {
-  const { cars, track } = race;
+  const { car, track } = race;
   return <>
     <RSvgContainer>
       <RTrack>{track}</RTrack>
-      {cars.map((car: IMCarRaceState) => (<RCar sensors={car.sensors && car.sensors.calcResults}>{car.carState}</RCar>))}
+      {((car: IRaceCarState) => (<RCar>{car.carState}</RCar>))(car)}
     </RSvgContainer>
   </>
 }

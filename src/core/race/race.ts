@@ -5,7 +5,7 @@ import { Point } from "../types";
 const collisionMinDist = 5;
 const checkpointMinDist = 20;
 
-export enum ERaceCarRaceState { crashed, finished, racing }
+export enum ERaceCarRaceState { crashed="crashed", finished="finished", racing="racing" }
 
 export type IRaceCarState = {
   readonly carState: ICarState,
@@ -88,6 +88,7 @@ export const evalRace = (carEnv: IFCarEnvironment) => (state: IRaceState, dt: nu
     track: state.track,
     car
   }
+  return newState;
 }
 
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { ICarState } from '../../core/race/car';
 import { RLine } from '../../components/svg/RLine';
 import { Line, Point } from '../../core/types';
-import { ISensorCalculationResult } from '../../core/race/sensor';
+import { ISensorCalculationResult } from '../../core/raceAI/sensor';
 import { RPoint } from '../../components/svg/RPoint';
 
 type Props = {

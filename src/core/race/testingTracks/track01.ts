@@ -1,4 +1,4 @@
-import { ITrack } from "../track";
+import { ITrack, Track } from "../track";
 import { Poly, Point } from "../../types";
 
 const track01: ITrack = {
@@ -67,4 +67,4 @@ const track01: ITrack = {
   })
 };
 
-export default track01;
+export default new Track(track01);

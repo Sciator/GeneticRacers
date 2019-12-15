@@ -34,9 +34,9 @@ export const _TestGANN = () => {
   const output = trainingSet.map(([input, output]) => output);
 
   const layers = {
-    input: trainingSet[0][0].length,
+    inputs: trainingSet[0][0].length,
     hiddens: hiddenLayers,
-    output: trainingSet[0][1].length,
+    outputs: trainingSet[0][1].length,
   };
 
   const nnParams: IANNInitParams = {

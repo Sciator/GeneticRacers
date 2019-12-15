@@ -6,9 +6,9 @@ import { range } from '../../common';
 /** layer scheme for creating new nn */
 export type IANNInitParams = {
   layerScheme: {
-    input: number,
+    inputs: number,
     hiddens: number[],
-    output: number
+    outputs: number
   },
   afunction?: {
     hidden: IANNActivationFunction,
@@ -48,7 +48,7 @@ export abstract class NeuralNet {
       out.afunction = nnInitParams.afunction;
     }
 
-    const { hiddens, input, output } = nnInitParams.layerScheme;
+    const { hiddens, inputs: input, outputs: output } = nnInitParams.layerScheme;
 
     // create tupples (input, hidden0) (hidden0, hidden1) ... (hiddenn, output)
     const tuples = [[input, hiddens[0]]] as [number, number][];

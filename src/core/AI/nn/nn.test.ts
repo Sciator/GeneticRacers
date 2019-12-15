@@ -10,7 +10,7 @@ describe("neural net", () => {
     range(10).slice(1).forEach(x => {
       range(100).slice(1).forEach(y => {
         const nnparamsTsst: IANNInitParams = {
-          layerScheme: { input: y, hiddens: [20], output: y, },
+          layerScheme: { inputs: y, hiddens: [20], outputs: y, },
         }
 
         const nn = NeuralNet.nnCreate(nnparamsTsst);

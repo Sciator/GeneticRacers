@@ -5,8 +5,8 @@ import track01 from '../../core/race/testingTracks/track01';
 import { Point } from '../../core/types';
 import { Track } from '../../core/race/track';
 import RRace from './Race';
-import { carInputsSetter, ICarInputs } from '../../core/race/car';
-import { calculateSensorDetection } from '../../core/race/sensor';
+import { carInputsSetter, ICarInputs, ETurnDirection } from '../../core/race/car';
+import { calculateSensorDetection } from '../../core/raceAI/sensor';
 
 type IProps = {
 
@@ -45,7 +45,7 @@ export const UserRace: React.FC<IProps> = () => {
 
       const inputs: ICarInputs = {
         engineOn: keyState.up,
-        turnDirection: ((keyState.left && "left") || (keyState.right && "right") || "")
+        turnDirection: ((keyState.left && ETurnDirection.left) || (keyState.right && ETurnDirection.right) || ETurnDirection.straight)
       };
 
       let car = race.cars[0].carState;
@@ -64,8 +64,9 @@ export const UserRace: React.FC<IProps> = () => {
 
   return (<>
     <div style={{ height: 300, width: 300 }}>
-
+{/*
       <RRace>{race}</RRace>
+ */}
     </div>
     <div style={{ whiteSpace: "revert" }}>
       {delta}
@@ -79,7 +80,7 @@ export const UserRace: React.FC<IProps> = () => {
       {JSON.stringify(race.cars[0].currentCheckpointDist)}
       {JSON.stringify(race.cars[0].currentCheckpoint)}
       <br />
-      {JSON.stringify(race.cars[0].sensors && race.cars[0].sensors.calcResults && race.cars[0].sensors.calcResults[0].minLength)}
+      {JSON.stringify(race.cars[0].sensors && race.cars[0].sensors.calcResults && race.cars[0].sensors.calcResults[0].nearestLength)}
     </div>
   </>);
 }
