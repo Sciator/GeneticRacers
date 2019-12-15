@@ -2,7 +2,7 @@ import { Track } from "../race/track"
 import { Point } from "../types"
 import { IANNActivationFunction } from "../AI/nn/nnActivationFunctions"
 import { IRaceCarState, raceInit, ERaceCarRaceState, evalRace, raceInputSetter, IRaceState } from "../race/race"
-import { IANNInitParams, NeuralNet, IANNData } from "../AI/nn/nn"
+import { NeuralNet, IANNData } from "../AI/nn/nn"
 import { calculateSensorDetection } from "./sensor"
 import { createCarEnvironment, ICarPhysicsOptions, ETurnDirection } from "../race/car"
 
@@ -77,7 +77,7 @@ export const evalRaceNN = (args: IRaceNNArg): IRaceNNHist => {
     const engineOn = nnRes[0];
     const turnDirection =
       (nnRes[1])
-        ? nnRes[0] ?
+        ? nnRes[2] ?
           straight
           : left
         : nnRes[1]
@@ -99,6 +99,5 @@ export const evalRaceNN = (args: IRaceNNArg): IRaceNNHist => {
 
   return { race, history, dt };
 };
-
 
 
