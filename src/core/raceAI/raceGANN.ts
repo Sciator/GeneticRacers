@@ -7,7 +7,6 @@ import { IASelectionFunctionType } from "../AI/ga/gaProcesGenerationFunction";
 
 
 export type IRaceGANNInit = {
-  numSensors: number,
   nnInit: {
     hiddenLayers: number[],
     afunction?: {
@@ -21,8 +20,9 @@ export type IRaceGANNInit = {
   raceNN: IRaceNNArg,
 }
 
-export const initRaceGANN = (args: IRaceGANNInit) => {
-  const { popSize, nnInit: { afunction, hiddenLayers }, raceNN, numSensors } = args;
+export const initRaceGANN = (args: IRaceGANNInit): IRaceGANNData => {
+  const { popSize, nnInit: { afunction, hiddenLayers }, raceNN } = args;
+  const numSensors = raceNN.sensors.length;
 
   const init = () => createRaceNN({ nnInit: { hiddenLayers }, numSensors });
 
@@ -36,6 +36,10 @@ export const initRaceGANN = (args: IRaceGANNInit) => {
 
   const gaData = GeneticAlgorithm.gaCreateData({ _function: { environment, init }, popSize });
 
+  return {
+    pop: gaData,
+    raceNN: raceNN,
+  };
 }
 
 

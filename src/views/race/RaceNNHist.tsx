@@ -1,15 +1,14 @@
 import React from 'react';
-import track01 from '../../core/race/testingTracks/track01';
-import { Track } from '../../core/race/track';
 import RRace from './Race';
 import { IRaceNNHist } from '../../core/raceAI/raceNN';
+import { raceGetCurrentScore } from '../../core/race/race';
 
 type IProps = {
-  history: IRaceNNHist
+  history: IRaceNNHist,
+  onHistDone?: () => void,
 }
-const track = new Track(track01);
 
-export const RRaceNNHist: React.FC<IProps> = ({history:{dt,history}}) => {
+export const RRaceNNHist: React.FC<IProps> = ({ history: { dt, history }, onHistDone }) => {
   const [delta, setDelta] = React.useState(0);
   const [timeStart, setTimeStart] = React.useState(Date.now());
 
@@ -28,10 +27,14 @@ export const RRaceNNHist: React.FC<IProps> = ({history:{dt,history}}) => {
 
     const timeFromStart = time - timeStart;
 
-    const histIndex = Math.round(timeFromStart / (dt*1000));
+    const histIndex = Math.round(timeFromStart / (dt * 1000));
 
-    if (histIndex<history.length){
-      setRace(history[histIndex])
+    if (histIndex < history.length) {
+      setRace(history[histIndex]);
+    }else{
+      setTimeout(()=>{
+        onHistDone && onHistDone();
+      })
     }
 
     previousTimeRef.current = time;
@@ -59,6 +62,8 @@ export const RRaceNNHist: React.FC<IProps> = ({history:{dt,history}}) => {
       <br />
       {JSON.stringify(race.car.carState.engineOn)}
       {JSON.stringify(race.car.carState.turnDirection)}
+      <br />
+      {JSON.stringify(raceGetCurrentScore(race))}
       <br />
       {JSON.stringify(race.car.carState.pos)}
       <br />
