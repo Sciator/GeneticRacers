@@ -4,7 +4,7 @@ import * as math from "mathjs";
 type GAPopulation<DNA> = readonly {
   readonly fitness: number,
   readonly dna: DNA,
-}[]
+}[];
 
 export type IBreedFunction<DNA> = (dna: DNA[], mutationRate: number) => DNA;
 
@@ -20,7 +20,7 @@ export type IAProcessGenerationFunction = {
 })
   ;
 
-export enum IASelectionFunctionType { percent, fixed } //, "differenceFromBest" ?
+export enum IASelectionFunctionType { percent, fixed, }
 export type IASelectionFunction = {
   type: IASelectionFunctionType,
   value: number,
@@ -28,15 +28,15 @@ export type IASelectionFunction = {
 
 type ISelectionFunction<DNA> = (pop: GAPopulation<DNA>) => DNA[];
 /** create function for selecting most fittest dna */
-export function createExecutableFncSelection<DNA>(aargs: IASelectionFunction): ISelectionFunction<DNA> {
+export const createExecutableFncSelection = <DNA>(aargs: IASelectionFunction): ISelectionFunction<DNA> => {
 
   switch (aargs.type) {
     case IASelectionFunctionType.fixed:
-      return (pop: GAPopulation<DNA>) => pop.slice(0, aargs.value).map(x => x.dna);
+      return (pop: GAPopulation<DNA>) => pop.slice(0, aargs.value).map((x) => x.dna);
     case IASelectionFunctionType.percent:
       return (pop: GAPopulation<DNA>) => {
         const val = Math.floor(pop.length * aargs.value / 100);
-        return pop.slice(0, val).map(x => x.dna)
+        return pop.slice(0, val).map((x) => x.dna);
       };
 
     default: throw new Error("invalid type");
@@ -44,14 +44,13 @@ export function createExecutableFncSelection<DNA>(aargs: IASelectionFunction): I
 };
 
 const createExecutableFnc = (aFnc: IAProcessGenerationFunction) => {
-  const { breedingParents, selection } = aFnc;
+  const { breedingParents, selection, } = aFnc;
   const canBreedSelf = aFnc.canBreedSelf || false;
 
   if (canBreedSelf)
     throw new Error("canBreedSelf not implemented");
 
   return <DNA>(breedFnc: IBreedFunction<DNA>) => {
-
     return (pop: GAPopulation<DNA>) => {
       const popLen = pop.length;
       const selectionFunction = createExecutableFncSelection<DNA>(selection);
@@ -61,15 +60,14 @@ const createExecutableFnc = (aFnc: IAProcessGenerationFunction) => {
         const selected =
           range(breedingParents)
             .map(() => math.randomInt(0, preparedForBreeding.length))
-            .map(x => preparedForBreeding[x])
+            .map((x) => preparedForBreeding[x])
           ;
 
         return breedFnc(selected, aFnc.mutationRate);
       });
 
-    }
-  }
-}
-
+    };
+  };
+};
 
 export default createExecutableFnc;

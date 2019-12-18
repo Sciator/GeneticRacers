@@ -30,15 +30,15 @@ export class GeneticAlgorithm<DNA> {
 
   /** creates sorted copy of DNA array */
   private static sortMostFitFirst<DNA>(pop: GAPopulation<DNA>) {
-    const cpy = [...pop]; cpy.sort(({ fitness: a }, { fitness: b }) => -(a - b)); return cpy;
+    const cpy = [...pop,]; cpy.sort(({ fitness: a, }, { fitness: b, }) => -(a - b)); return cpy;
   }
 
   /** population sorted by fittest */
-  readonly population: GAPopulation<DNA>;
+  public readonly population: GAPopulation<DNA>;
 
   /** returns function that create new population based on fitness value and selection+ */
-  calculateNextGen(evalFunctions: IAProcessGenerationFunction) {
-    const { population, _functions: { _breed, _environment } } = this;
+  public calculateNextGen(evalFunctions: IAProcessGenerationFunction) {
+    const { population, _functions: { _breed, _environment, }, } = this;
 
     const createGeneration = createExecutableFnc(evalFunctions)(_breed);
 
@@ -47,7 +47,7 @@ export class GeneticAlgorithm<DNA> {
     const evaledNextGen: GeneticAlgorithm<DNA> =
       new GeneticAlgorithm<DNA>(
         this._functions,
-        GeneticAlgorithm.sortMostFitFirst(nextGen.map(x => { return { dna: x, fitness: _environment(x) } })
+        GeneticAlgorithm.sortMostFitFirst(nextGen.map((x) => ({ dna: x, fitness: _environment(x), }))
         ));
 
     return evaledNextGen;
@@ -55,16 +55,16 @@ export class GeneticAlgorithm<DNA> {
 
   /** function for create initial random DNAs */
   public static readonly create = <DNA>(fncs: GAFunctions<DNA>) => (ainitArgs: IAGAInitArgs): GeneticAlgorithm<DNA> => {
-    const { popSize, _init, _environment } = { ...ainitArgs, ...fncs };
+    const { popSize, _init, _environment, } = { ...ainitArgs, ...fncs, };
 
     return new GeneticAlgorithm<DNA>(
       fncs,
       GeneticAlgorithm.sortMostFitFirst(
         range(popSize)
           .map(_init)
-          .map(x => { return { fitness: _environment(x), dna: x } })
+          .map((x) => ({ fitness: _environment(x), dna: x, }))
       )
-    )
+    );
   }
 
   private constructor(fncs: {

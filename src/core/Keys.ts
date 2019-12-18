@@ -1,8 +1,8 @@
 export const keyState = {
-  "up": false,
-  "down": false,
-  "left": false,
-  "right": false,
+  up: false,
+  down: false,
+  left: false,
+  right: false,
 };
 
 const keyCodeMap = {
@@ -16,6 +16,7 @@ let registered = false;
 
 const register = () => {
   if (!registered) {
+    registered = true;
     document.addEventListener("keydown", (event) => {
       const direction = (keyCodeMap as any)[event.keyCode];
       if (direction === undefined) {
@@ -25,14 +26,14 @@ const register = () => {
       (keyState as any)[direction] = true;
     });
 
-    document.addEventListener("keyup", function (event) {
-      var direction = (keyCodeMap as any)[event.keyCode];
+    document.addEventListener("keyup", (event) => {
+      const direction = (keyCodeMap as any)[event.keyCode];
       if (direction === undefined) {
         return;
       }
-  
+
       (keyState as any)[direction] = false;
     });
   }
-}
+};
 register();

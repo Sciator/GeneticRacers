@@ -1,5 +1,3 @@
-import { range } from "./common";
-
 const calcPrecisionComparisonLine = 8;
 
 export type IFReal = (x: number) => number;
@@ -10,32 +8,32 @@ export class Point {
   public readonly x: number;
   public readonly y: number;
 
-  public plus(other: Point) {
+  public readonly plus = (other: Point) => {
     const { x, y } = this;
     const { x: ox, y: oy } = other;
     return new Point({ x: x + ox, y: y + oy });
   }
 
-  public minus(other: Point) {
+  public readonly minus = (other: Point) => {
     const { x, y } = this;
     const { x: ox, y: oy } = other;
     return new Point({ x: x - ox, y: y - oy });
   }
 
-  public multiply(multiplier: number) {
+  public readonly multiply = (multiplier: number) => {
     const { x, y } = this;
     return new Point({ x: x * multiplier, y: y * multiplier });
   }
 
-  public rotateRad(radians: number): Point {
+  public readonly rotateRad = (radians: number): Point => {
     const { x, y } = this;
     const [cosTheta, sinTheta] = [Math.cos(radians), Math.sin(radians)];
 
     return new Point({
       x: cosTheta * x - sinTheta * y,
       y: cosTheta * y + sinTheta * x,
-    })
-  };
+    });
+  }
 
   public get magnitude(): number {
     const { x, y } = this;
@@ -48,14 +46,14 @@ export class Point {
   }
 
   public get angleDeg() {
-    var angle = Math.atan2(this.y, this.x);   //radians
+    const angle = Math.atan2(this.y, this.x);   // radians
     // you need to devide by PI, and MULTIPLY by 180:
-    var degrees = 180 * angle / Math.PI;  //degrees
-    return (360 + Math.round(degrees)) % 360; //round number, avoid decimal fragments
+    const degrees = 180 * angle / Math.PI;  // degrees
+    return (360 + Math.round(degrees)) % 360; // round number, avoid decimal fragments
   }
 
   public get angleRad() {
-    var angle = Math.atan2(this.y, this.x);   //radians
+    const angle = Math.atan2(this.y, this.x);   // radians
     return angle;
   }
 
@@ -65,7 +63,7 @@ export class Point {
   }
 }
 
-export type ILine = { readonly p1: (IPoint | Point), readonly p2: (IPoint | Point) }
+export type ILine = { readonly p1: (IPoint | Point), readonly p2: (IPoint | Point) };
 export class Line {
   public readonly p1: Point;
   public readonly p2: Point;
@@ -82,26 +80,26 @@ export class Line {
     const dot = a * c + b * d;
     const lenSq = c * c + d * d;
 
-    const param = (lenSq != 0) ? dot / lenSq : -1;
+    const param = (lenSq !== 0) ? dot / lenSq : -1;
 
     const { xx, yy } = (() => {
       if (param < 0) {
         return {
           xx: x1,
-          yy: y1
-        }
+          yy: y1,
+        };
       }
       else if (param > 1) {
         return {
           xx: x2,
           yy: y2,
-        }
+        };
       }
       else {
         return {
           xx: x1 + param * c,
           yy: y1 + param * d,
-        }
+        };
       }
     })();
 
@@ -112,13 +110,13 @@ export class Line {
     const { p1, p2 } = this;
     const { p1: p1o, p2: p2o } = other;
 
-    let a1 = p2.y - p1.y;
-    let b1 = p1.x - p2.x;
-    let c1 = a1 * (p1.x) + b1 * (p1.y);
+    const a1 = p2.y - p1.y;
+    const b1 = p1.x - p2.x;
+    const c1 = a1 * (p1.x) + b1 * (p1.y);
 
-    let a2 = p2o.y - p1o.y;
-    let b2 = p1o.x - p2o.x;
-    let c2 = a2 * (p1o.x) + b2 * (p1o.y);
+    const a2 = p2o.y - p1o.y;
+    const b2 = p1o.x - p2o.x;
+    const c2 = a2 * (p1o.x) + b2 * (p1o.y);
 
     const determinant = a1 * b2 - a2 * b1;
 
@@ -127,12 +125,14 @@ export class Line {
       const y = (a1 * c2 - a2 * c1) / determinant;
 
       // intersection point
-      const i = new Point({ x, y });;
+      const i = new Point({ x, y });
 
 
       if (
-        (p1.distance(i) + p2.distance(i)).toPrecision(calcPrecisionComparisonLine) === (p1.distance(p2)).toPrecision(calcPrecisionComparisonLine) &&
-        (p1o.distance(i) + p2o.distance(i)).toPrecision(calcPrecisionComparisonLine) === (p1o.distance(p2o)).toPrecision(calcPrecisionComparisonLine)
+        ((p1.distance(i) + p2.distance(i)).toPrecision(calcPrecisionComparisonLine)
+          === (p1.distance(p2)).toPrecision(calcPrecisionComparisonLine)) &&
+        ((p1o.distance(i) + p2o.distance(i)).toPrecision(calcPrecisionComparisonLine)
+          === (p1o.distance(p2o)).toPrecision(calcPrecisionComparisonLine))
       ) {
         return i;
       }
@@ -145,18 +145,18 @@ export class Line {
   }
 }
 
-export type IPoly = { points: readonly (Point | IPoint)[] }
+export type IPoly = { points: readonly (Point | IPoint)[] };
 export class Poly {
   public readonly points: readonly Point[];
 
   public get lines() {
     const { points } = this;
     const len = points.length;
-    return points.map((p1, p1i) => new Line({ p1, p2: points[(p1i + 1) % len] }))
+    return points.map((p1, p1i) => new Line({ p1, p2: points[(p1i + 1) % len] }));
   }
 
   constructor({ points }: IPoly) {
-    this.points = points.map(p => p instanceof Point ? p : new Point(p));
+    this.points = points.map((p) => p instanceof Point ? p : new Point(p));
   }
 }
 

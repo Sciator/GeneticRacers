@@ -5,8 +5,8 @@ import { IANNInitParams, NeuralNet } from "./nn";
 
 describe("neural net", () => {
   it("should not crash", () => {
-    range(10).slice(1).forEach(x => {
-      range(100).slice(1).forEach(y => {
+    range(10).slice(1).forEach((x) => {
+      range(100).slice(1).forEach((y) => {
         const nnparamsTsst: IANNInitParams = {
           layerScheme: { inputs: y, hiddens: [20], outputs: y, },
         };

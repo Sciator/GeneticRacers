@@ -9,30 +9,26 @@ export type ISensorCalculationResult = {
   nearestLength: number,
   // nearest collision detected mapped between 1 and 0 (1 not found 0 crashed)
   nearestMapped: number,
-}
+};
 
 export const calculateSensorDetection = (track: Track) => (sensorsRelativePoints: Point[]) => (car: ICarState) =>
-  sensorsRelativePoints.map(sensorRelative => {
+  sensorsRelativePoints.map((sensorRelative) => {
     const sensorTarget: Point = sensorRelative.rotateRad(car.heading.angleRad).plus(car.pos);
 
     const sensorLine: Line = new Line({ p1: car.pos, p2: sensorTarget });
 
     const intersectionPoints = track.road.lines
-      .map(x => x.Intersection(sensorLine))
-      .filter(x => x != undefined
+      .map((x) => x.Intersection(sensorLine))
+      .filter((x) => x !== undefined
       ) as Point[];
 
     const nearestLength = Math.min(...intersectionPoints
       .concat(sensorTarget)
-      .map(x => x.distance(car.pos))
+      .map((x) => x.distance(car.pos))
     );
 
     const nearestMapped = nearestLength / sensorRelative.magnitude;
 
     return { sensorLine, intersectionPoints, sensorTarget, nearestLength, nearestMapped } as ISensorCalculationResult;
   });
-
-
-
-
 

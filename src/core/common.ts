@@ -4,7 +4,7 @@ export const range: {
 } = (n: number, m?: number): number[] => {
   if (!m)
     return [...new Array(n).keys()];
-  return [...new Array(m - n).keys()].map(x => x + n);
+  return [...new Array(m - n).keys()].map((x) => x + n);
 };
 
 export const zip = <T1, T2>(arr1: T1[], arr2: T2[]): [T1, T2][] =>
@@ -15,5 +15,5 @@ export const flatReducer = <T>(a: T[], b: T[]) => a.concat(b);
 
 /** split array to chunks of given length */
 export const splitToChunks = <T>(arr: T[], chunkSize: number): T[][] => range(Math.ceil(arr.length / chunkSize))
-  .map(x => arr.slice(x * chunkSize, (x + 1) * chunkSize))
+  .map((x) => arr.slice(x * chunkSize, (x + 1) * chunkSize))
   ;

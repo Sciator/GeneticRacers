@@ -1,7 +1,6 @@
 import { ITrack } from "./track";
-import { ICarState, IFCarEnvironment, createCarEnvironment, ICarPhysicsOptions, ICarInputs, carInputsSetter } from "./car";
+import { ICarState, IFCarEnvironment, ICarInputs, carInputsSetter } from "./car";
 import { Point } from "../types";
-import { ISensorCalculationResult, calculateSensorDetection } from "../raceAI/sensor";
 import { range, zip } from "../common";
 
 const collisionMinDist = 5;
@@ -13,27 +12,26 @@ export type IRaceCarState = {
   readonly carState: ICarState,
   readonly currentCheckpoint: number,
   readonly raceState: ERaceCarRaceState,
-}
+};
 
 export type IRaceState = {
   readonly track: ITrack;
   readonly cars: IRaceCarState[];
-}
+};
 
 export type IRaceInit = {
   readonly track: ITrack;
   readonly numOfCars: number;
-}
+};
 
 
 export const calculateCheckpointDistance = (checkpoints: Point[]) => (car: IRaceCarState) => {
   const { currentCheckpoint, carState: { pos } } = car;
   const ci = currentCheckpoint;
-  if (ci >= checkpoints.length)
-    return -1;
+  if (ci >= checkpoints.length) return -1;
 
   return checkpoints[ci].distance(pos);
-}
+};
 
 
 
@@ -49,11 +47,11 @@ export const raceInit = ({ numOfCars, track }: IRaceInit): IRaceState => {
 
         engineOn: false,
         turnDirection: 0,
-      }
+      },
     } as IRaceCarState));
 
-  return { cars, track }
-}
+  return { cars, track };
+};
 
 export const raceEvaluator = (carEnv: IFCarEnvironment) => (state: IRaceState, dt: number) => {
   const { track: { road: { lines: roads } } } = state;
@@ -62,15 +60,15 @@ export const raceEvaluator = (carEnv: IFCarEnvironment) => (state: IRaceState, d
 
   const isCarCrashed = (car: ICarState) => {
     const { pos } = car;
-    for (let i = 0; i < roads.length; i++) {
+    for (const i of Array(roads.length)) {
       const r = roads[i];
-      if (r.distanceFromPoint(pos) <= collisionMinDist)
-        return true;
+
+      if (r.distanceFromPoint(pos) <= collisionMinDist) return true;
     }
     return false;
-  }
+  };
 
-  const cars = state.cars.map(car => {
+  const cars = state.cars.map((car) => {
     if (car.raceState !== ERaceCarRaceState.racing)
       return car;
 
@@ -78,7 +76,11 @@ export const raceEvaluator = (carEnv: IFCarEnvironment) => (state: IRaceState, d
 
     const carCheckpointDist = calcCarCheckpointDist(car);
 
-    const currentCheckpoint = carCheckpointDist <= checkpointMinDist ? car.currentCheckpoint + 1 : car.currentCheckpoint
+    const currentCheckpoint =
+      carCheckpointDist <= checkpointMinDist
+        ? car.currentCheckpoint + 1
+        : car.currentCheckpoint
+        ;
 
     const raceState = currentCheckpoint === state.track.checkpoints.length
       ? ERaceCarRaceState.finished
@@ -88,13 +90,13 @@ export const raceEvaluator = (carEnv: IFCarEnvironment) => (state: IRaceState, d
       ;
 
     return { carState, currentCheckpoint, raceState } as IRaceCarState;
-  })
+  });
 
   const newState: IRaceState = {
     track: state.track,
-    cars
-  }
-}
+    cars,
+  };
+};
 
 
 export const raceInputSetter = (state: IRaceState, inputs: ICarInputs[]): IRaceState => {
@@ -103,6 +105,6 @@ export const raceInputSetter = (state: IRaceState, inputs: ICarInputs[]): IRaceS
     ({ ...car, carState: carInputsSetter(car.carState, input), })
   );
   return {
-    cars, track
-  }
-}
+    cars, track,
+  };
+};

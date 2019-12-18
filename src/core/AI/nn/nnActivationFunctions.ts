@@ -7,7 +7,7 @@ export type IANNActivationFunction = {
   type: IANNActivationFunctionType,
 };
 
-//todo: odestranit komentář
+// todo: odestranit komentář
 /* sigmoid -> výstup [0,1] vahlazený */
 export const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
 
@@ -22,6 +22,6 @@ export const createExecutableFnc = (aFnc: IANNActivationFunction): IFReal => {
     case IANNActivationFunctionType.relu: return relu;
     case IANNActivationFunctionType.sigmoid: return sigmoid;
     case IANNActivationFunctionType.tanh: return tanh;
-    default: throw new Error(`invalid function params ${JSON.stringify(aFnc)}`)
+    default: throw new Error(`invalid function params ${JSON.stringify(aFnc)}`);
   }
-}
+};

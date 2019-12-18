@@ -18,11 +18,11 @@ describe("Genetic algorithm", () => {
     const _init = () => range(textL).map(getRandomChar).join("");
 
     const _environment = (w: string) =>
-      math.mean(range(textL).map(x => text[x] === w[x]).map(x => x ? 1 : 0));
+      math.mean(range(textL).map((x) => text[x] === w[x]).map((x) => x ? 1 : 0));
 
     const _breed = (w: string[], mr: number) => {
-      const [f] = w;
-      return f.split("").map(x => mr >= Math.random() ? getRandomChar() : x).join("");
+      const [f,] = w;
+      return f.split("").map((x) => mr >= Math.random() ? getRandomChar() : x).join("");
     };
 
     const popSize = 100;
@@ -37,14 +37,14 @@ describe("Genetic algorithm", () => {
       canBreedSelf: false,
     };
 
-    let ga = GeneticAlgorithm.create({ _breed, _environment, _init })({ popSize });
+    let ga = GeneticAlgorithm.create({ _breed, _environment, _init, })({ popSize, });
 
     range(200).forEach(() => {
       ga = ga.calculateNextGen(gaProcessFunction);
-    })
+    });
 
     expect(ga.population[0].dna).toBe(text);
   });
 
-  //todo: breed multiple together test
+  // todo: breed multiple together test
 });

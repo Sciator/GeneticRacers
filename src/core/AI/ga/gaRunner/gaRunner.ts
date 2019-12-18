@@ -1,5 +1,5 @@
 import { IAProcessGenerationFunction, IBreedFunction } from "../gaProcesGenerationFunction";
-import { IInitDNA, IEnvironment, IAGADataPopulation, GeneticAlgorithm } from "../ga";
+import { IInitDNA, IEnvironment, GeneticAlgorithm } from "../ga";
 
 
 export type IAGAExternalFunctions<DNA> = {
@@ -7,11 +7,6 @@ export type IAGAExternalFunctions<DNA> = {
   environment: IEnvironment<DNA>,
   breed: IBreedFunction<DNA>,
 };
-
-const a = (a: number) => {
-
-}
-a(10);
 
 export type IAGARunner<DNA> = {
   /** size of population */
@@ -54,7 +49,7 @@ export class MGARunner<DNA> {
       generations.push(population);
     } else {
       const evaluator = GeneticAlgorithm.createGAEvaluator({ gaProcessFunction, _function: { breed, environment } })
-      const population = evaluator(this.lastGeneration)
+      const population = evaluator(this.lastGeneration);
       generations.push(population);
     }
   }
@@ -63,7 +58,7 @@ export class MGARunner<DNA> {
     const { _functions, popSize, gaProcessFunction, } = args;
     this._functions = _functions;
 
-    this.data = { gaProcessFunction, popSize, generations: [] }
+    this.data = { gaProcessFunction, popSize, generations: [], };
   }
 }
 

@@ -1,6 +1,6 @@
-import { ICreateRaceNeuralNet, IRaceNNArg, createRaceNN, evalRaceNN } from "./raceNN";
+import { IRaceNNArg, createRaceNN, evalRaceNN } from "./raceNN";
 import { IANNData } from "../AI/nn/nn";
-import { IAGADataPopulation, IAGAInitArgs, GAEvaluator, GeneticAlgorithm } from "../AI/ga/ga";
+import { GeneticAlgorithm } from "../AI/ga/ga";
 import { IANNActivationFunction } from "../AI/nn/nnActivationFunctions";
 import { raceGetCurrentScore } from "../race/race";
 import { IASelectionFunctionType } from "../AI/ga/gaProcesGenerationFunction";
@@ -18,10 +18,10 @@ export type IRaceGANNInit = {
   popSize: number,
 
   raceNN: IRaceNNArg,
-}
+};
 
 export const initRaceGANN = (args: IRaceGANNInit): IRaceGANNData => {
-  const { popSize, nnInit: { afunction, hiddenLayers }, raceNN } = args;
+  const { popSize, nnInit: { hiddenLayers }, raceNN } = args;
   const numSensors = raceNN.sensors.length;
 
   const init = () => createRaceNN({ nnInit: { hiddenLayers }, numSensors });
@@ -32,21 +32,21 @@ export const initRaceGANN = (args: IRaceGANNInit): IRaceGANNData => {
       nn,
     });
     return raceGetCurrentScore({ car: raceRes.race.car, track: raceNN.track });
-  }
+  };
 
   const gaData = GeneticAlgorithm.gaCreateData({ _function: { environment, init }, popSize });
 
   return {
+    raceNN,
     pop: gaData,
-    raceNN: raceNN,
   };
-}
+};
 
 
 export type IRaceGANNData = {
   pop: IAGADataPopulation<IANNData>,
   raceNN: IRaceNNArg,
-}
+};
 
 
 export const evalRaceGANN = (data: IRaceGANNData): IRaceGANNData => {
@@ -58,7 +58,7 @@ export const evalRaceGANN = (data: IRaceGANNData): IRaceGANNData => {
       nn,
     });
     return raceGetCurrentScore({ car: raceRes.race.car, track: raceNN.track });
-  }
+  };
 
   const breed = ([nn]: IANNData[], mr: number) => {
     const { functions, values: { biases, weights } } = nn;
@@ -72,8 +72,8 @@ export const evalRaceGANN = (data: IRaceGANNData): IRaceGANNData => {
       values: {
         biases: biases.map(modifArr),
         weights: weights.map(modifArrArr),
-      }
-    }
+      },
+    };
   };
 
   const gaEvaluator: GAEvaluator<IANNData> = {
@@ -88,7 +88,7 @@ export const evalRaceGANN = (data: IRaceGANNData): IRaceGANNData => {
     _function: {
       environment,
       breed,
-    }
+    },
   };
 
   const evaluator = GeneticAlgorithm(gaEvaluator);
@@ -98,8 +98,8 @@ export const evalRaceGANN = (data: IRaceGANNData): IRaceGANNData => {
   return {
     raceNN: data.raceNN,
     pop: evaledData,
-  }
-}
+  };
+};
 
 
 export const raceGANNGetHist = (data: IRaceGANNData) => {
@@ -112,4 +112,4 @@ export const raceGANNGetHist = (data: IRaceGANNData) => {
     });
     return raceRes;
   });
-}
+};

@@ -3,7 +3,8 @@ import { Point, Poly } from "../types";
 export type ITrack = {
   checkpoints: Point[],
   road: Poly,
-}
+};
+
 export class Track {
   public readonly road: Poly;
   public readonly checkpoints: Point[];
@@ -12,4 +13,4 @@ export class Track {
     this.road = road;
     this.checkpoints = checkpoints;
   }
-}
+};

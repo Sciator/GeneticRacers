@@ -1,5 +1,5 @@
 import { Point } from "../types";
-//source: https://github.com/chipbell4/car-physics
+// source: https://github.com/chipbell4/car-physics
 
 const BEST_TURN_SPEED = 0.3;
 const TURN_AT_TOP_SPEED = 0.75;
@@ -26,7 +26,7 @@ export type ICarState = {
   readonly heading: Point,
   readonly turnDirection: 0 | 1 | -1,
   readonly engineOn: boolean,
-}
+};
 
 type ICarStateMutable = {
   pos: Point,
@@ -34,7 +34,7 @@ type ICarStateMutable = {
   heading: Point,
   turnDirection: 0 | 1 | -1,
   engineOn: boolean,
-}
+};
 
 export enum ETurnDirection { left = -1, right = 1, straight = 0 }
 
@@ -45,7 +45,7 @@ const carStateMutableCopy = (car: ICarState) => ({ ...car });
 export type ICarInputs = { engineOn: boolean, turnDirection: ETurnDirection };
 
 export const carInputsSetter = (car: ICarState, { engineOn, turnDirection }: ICarInputs): ICarState =>
-  ({ ...car, engineOn, turnDirection: turnDirection });
+  ({ ...car, engineOn, turnDirection });
 
 export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment => {
   const { acceleration, friction, handling, topSpeed, traction } = { ...defaultCarPhysicsOptions, ...(opt || {}) };
@@ -56,14 +56,14 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
     // if we"re turning, apply a turn direction by rotating the D vector
     let rotationalVelocity = 0;
     // base the amount of rotation based on percentage of top speed. (See the constants above)
-    let percentageSpeed = velocity.magnitude / topSpeed;
+    const percentageSpeed = velocity.magnitude / topSpeed;
 
     if (percentageSpeed < BEST_TURN_SPEED) {
       rotationalVelocity = percentageSpeed / BEST_TURN_SPEED * handling;
     } else {
       // Handling decreases from full handling to a percentage at top speed.
-      let slope = handling * (1 - TURN_AT_TOP_SPEED) / (BEST_TURN_SPEED - 1);
-      let intercept = handling - slope * BEST_TURN_SPEED;
+      const slope = handling * (1 - TURN_AT_TOP_SPEED) / (BEST_TURN_SPEED - 1);
+      const intercept = handling - slope * BEST_TURN_SPEED;
       rotationalVelocity = intercept + slope * percentageSpeed;
     }
 
@@ -83,8 +83,7 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
 
     // If the thruster is off, break out
     // or we"re at the top speed don"t accelerate
-    if ((!engineOn) || (velocity.magnitude >= topSpeed))
-      return;
+    if ((!engineOn) || (velocity.magnitude >= topSpeed)) return;
 
 
     car.velocity = car.heading.multiply(dt * acceleration);
@@ -93,8 +92,7 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
   const applyFriction = (car: ICarStateMutable, dt: number) => {
     const { engineOn, velocity } = car;
     // Dont apply friction if the thruster is on
-    if (engineOn)
-      return;
+    if (engineOn) return;
 
     car.velocity = velocity.multiply(Math.pow(1 - friction, dt));
   };
@@ -115,8 +113,7 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
     let amountToCorrect = dt * traction * (-Math.sign(theta));
 
     // If the amount of correction needed is less that what traction could do, we"ll just realign
-    if (Math.abs(theta) < amountToCorrect)
-      amountToCorrect = -theta;
+    if (Math.abs(theta) < amountToCorrect) amountToCorrect = -theta;
 
 
     // now "fix" velocity by rotating it a little
@@ -124,16 +121,14 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
   };
 
   return (car: ICarState, dt: number) => {
-    if (car.heading.magnitude === 0)
-      throw new Error("invalid car heading");
+    if (car.heading.magnitude === 0) throw new Error("invalid car heading");
 
-    let out = carStateMutableCopy(car);
+    const out = carStateMutableCopy(car);
     applyVelocity(out, dt);
     updateTurn(out, dt);
     applyAcceleration(out, dt);
     applyFriction(out, dt);
     applyTraction(out, dt);
-    // console.log(out)
     return out;
   };
-}
+};

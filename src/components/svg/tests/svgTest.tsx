@@ -15,7 +15,7 @@ export const SvgTest = () => {
       { x: 80, y: 120 },
       { x: 120, y: 140 },
       { x: 200, y: 180 },
-    ]
+    ],
   });
 
   return (<>
@@ -24,8 +24,5 @@ export const SvgTest = () => {
       <RLine>{new Line({ p1: { x: 10, y: 20 }, p2: { x: 20, y: 30 } })}</RLine>
       <RPoint>{{ x: 10, y: 20 }}</RPoint>
     </RSvgContainer>
-  </>)
-}
-
-
-
+  </>);
+};

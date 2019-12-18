@@ -15,24 +15,24 @@ export type IMCarRaceState = {
     points: Point[],
     calcResults?: ISensorCalculationResult[]
   }
-}
+};
 
 export class MRace {
-  track: ITrack;
-  cars: IMCarRaceState[];
-  carEnvironment: IFCarEnvironment;
+  public track: ITrack;
+  public cars: IMCarRaceState[];
+  public carEnvironment: IFCarEnvironment;
 
   public calculateCheckpoint() {
     const { cars, track: { checkpoints } } = this;
-    cars.filter(car => car.raceState === undefined)
-      .forEach(car => {
+    cars.filter((car) => car.raceState === undefined)
+      .forEach((car) => {
         const { currentCheckpoint, carState: { pos } } = car;
         const c = checkpoints[currentCheckpoint + 1];
 
         car.currentCheckpointDist = c.distance(pos);
         if (car.currentCheckpointDist <= checkpointDist) {
           car.currentCheckpoint++;
-          if (car.currentCheckpoint === checkpoints.length-1)
+          if (car.currentCheckpoint === checkpoints.length - 1)
             car.raceState = "done";
         }
 
@@ -43,10 +43,10 @@ export class MRace {
     const { cars, track: { road: { lines: roads } } } = this;
 
     cars
-      .filter(car => car.raceState === undefined)
-      .forEach(car => {
+      .filter((car) => car.raceState === undefined)
+      .forEach((car) => {
         const { carState: { pos } } = car;
-        roads.forEach(r => {
+        roads.forEach((r) => {
           if (r.distanceFromPoint(pos) <= collisionDist)
             car.raceState = "colided";
         });
@@ -60,18 +60,18 @@ export class MRace {
     this.calculateCheckpoint();
 
     cars
-      .filter(x => x.raceState === undefined)
-      .forEach(car => {
+      .filter((x) => x.raceState === undefined)
+      .forEach((car) => {
         car.carState = carEnvironment(car.carState, dt);
         if (car.sensors) {
           car.sensors.calcResults = calculateSensorDetection(track)(car.sensors.points)(car.carState);
         }
-      })
+      });
   }
 
   constructor(track: ITrack, cars: ICarState[], options?: ICarPhysicsOptions) {
     this.track = track;
-    this.cars = cars.map(x => ({ carState: x, currentCheckpoint: 0, currentCheckpointDist: Infinity }));
+    this.cars = cars.map((x) => ({ carState: x, currentCheckpoint: 0, currentCheckpointDist: Infinity }));
     this.carEnvironment = createCarEnvironment(options);
   }
 }

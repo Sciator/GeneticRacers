@@ -1,27 +1,27 @@
 import { ITrack } from "./track";
-import { ICarState, IFCarEnvironment, createCarEnvironment, ICarPhysicsOptions, ICarInputs, carInputsSetter } from "./car";
+import { ICarState, IFCarEnvironment, ICarInputs, carInputsSetter } from "./car";
 import { Point } from "../types";
 
 const collisionMinDist = 5;
 const checkpointMinDist = 20;
 
-export enum ERaceCarRaceState { crashed="crashed", finished="finished", racing="racing" }
+export enum ERaceCarRaceState { crashed = "crashed", finished = "finished", racing = "racing" }
 
 export type IRaceCarState = {
   readonly carState: ICarState,
   /** checkpoint car currently heading to */
   readonly currentCheckpoint: number,
   readonly raceState: ERaceCarRaceState,
-}
+};
 
 export type IRaceState = {
   readonly track: ITrack;
   readonly car: IRaceCarState;
-}
+};
 
 export type IRaceInit = {
   readonly track: ITrack;
-}
+};
 
 export const calculateCheckpointDistance = (checkpoints: Point[]) => (car: IRaceCarState) => {
   const { currentCheckpoint, carState: { pos } } = car;
@@ -30,7 +30,7 @@ export const calculateCheckpointDistance = (checkpoints: Point[]) => (car: IRace
     return -1;
 
   return checkpoints[ci].distance(pos);
-}
+};
 
 export const raceInit = ({ track }: IRaceInit): IRaceState => ({
   track,
@@ -44,7 +44,7 @@ export const raceInit = ({ track }: IRaceInit): IRaceState => ({
 
       engineOn: false,
       turnDirection: 0,
-    }
+    },
   },
 });
 
@@ -56,7 +56,7 @@ export const evalRace = (carEnv: IFCarEnvironment) => (state: IRaceState, dt: nu
 
   const isCarCrashed = (car: ICarState) => {
     const { pos } = car;
-    for (let i = 0; i < roads.length; i++) {
+    for (const i of Array(roads.length)) {
       const r = roads[i];
       if (r.distanceFromPoint(pos) <= collisionMinDist)
         return true;
@@ -64,7 +64,7 @@ export const evalRace = (carEnv: IFCarEnvironment) => (state: IRaceState, dt: nu
     return false;
   }
 
-  const car = (car => {
+  const car = ((car) => {
     if (car.raceState !== ERaceCarRaceState.racing)
       return car;
 
@@ -72,7 +72,11 @@ export const evalRace = (carEnv: IFCarEnvironment) => (state: IRaceState, dt: nu
 
     const carCheckpointDist = calcCarCheckpointDist(car);
 
-    const currentCheckpoint = carCheckpointDist <= checkpointMinDist ? car.currentCheckpoint + 1 : car.currentCheckpoint
+    const currentCheckpoint =
+      carCheckpointDist <= checkpointMinDist
+        ? car.currentCheckpoint + 1
+        : car.currentCheckpoint
+      ;
 
     const raceState = currentCheckpoint === state.track.checkpoints.length
       ? ERaceCarRaceState.finished
@@ -86,21 +90,25 @@ export const evalRace = (carEnv: IFCarEnvironment) => (state: IRaceState, dt: nu
 
   const newState: IRaceState = {
     track: state.track,
-    car
-  }
+    car,
+  };
   return newState;
-}
+};
 
 
 export const raceInputSetter = (state: IRaceState, inputs: ICarInputs): IRaceState => ({
   track: state.track,
-  car: { ...state.car, carState: carInputsSetter(state.car.carState, inputs), }
+  car: { ...state.car, carState: carInputsSetter(state.car.carState, inputs), },
 });
 
 
 const maxScore = 1000;
 
-export const raceGetCurrentScore = ({ track: { checkpoints }, car: { currentCheckpoint: currentCheckpointIndex, raceState, carState: { pos } } }: IRaceState) => {
+export const raceGetCurrentScore = (state: IRaceState) => {
+  const {
+    track: { checkpoints },
+    car: { currentCheckpoint: currentCheckpointIndex, raceState, carState: { pos } } } = state;
+
   if (raceState === ERaceCarRaceState.finished)
     return maxScore;
   const currentCheckpoint = checkpoints[currentCheckpointIndex];
