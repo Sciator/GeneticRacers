@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Paper, Input, TextField, Grid, Button, Slider, Typography, Switch, Select, MenuItem } from '@material-ui/core';
-import { IASelectionFunctionType } from '../core/AI/ga/gaProcesGenerationFunction';
+import React, { useState } from "react";
+import { Paper, Input, TextField, Grid, Button, Slider, Typography, Switch, Select, MenuItem } from "@material-ui/core";
+import { IASelectionFunctionType } from "../core/AI/ga/gaProcesGenerationFunction";
 
 
 export const GeneticAlgorithm: React.FC = () => {

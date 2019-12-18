@@ -1,5 +1,5 @@
-import React from 'react';
-import { Point, IPoint } from '../../core/types';
+import React from "react";
+import { Point, IPoint } from "../../core/types";
 
 type IProps = {
   children: IPoint,

@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import jest from 'jest';
-import { range } from '../../common';
-import { GeneticAlgorithm } from './ga';
-import * as math from 'mathjs';
-import { IASelectionFunctionType, IAProcessGenerationFunction } from './gaProcesGenerationFunction';
+import jest from "jest";
+import { range } from "../../common";
+import { GeneticAlgorithm } from "./ga";
+import * as math from "mathjs";
+import { IASelectionFunctionType, IAProcessGenerationFunction } from "./gaProcesGenerationFunction";
 
 const alpha = "abcdefghijklmnopqrstuvwxyz ";
 
@@ -15,14 +15,14 @@ describe("Genetic algorithm", () => {
     const text = "simple text blah blah";
 
     const textL = text.length;
-    const _init = () => range(textL).map(getRandomChar).join('');
+    const _init = () => range(textL).map(getRandomChar).join("");
 
     const _environment = (w: string) =>
       math.mean(range(textL).map(x => text[x] === w[x]).map(x => x ? 1 : 0));
 
     const _breed = (w: string[], mr: number) => {
       const [f] = w;
-      return f.split('').map(x => mr >= Math.random() ? getRandomChar() : x).join('');
+      return f.split("").map(x => mr >= Math.random() ? getRandomChar() : x).join("");
     };
 
     const popSize = 100;

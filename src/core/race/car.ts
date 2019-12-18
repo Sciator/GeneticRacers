@@ -53,7 +53,7 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
   const updateTurn = (car: ICarStateMutable, dt: number) => {
     const { velocity, turnDirection, heading } = car;
 
-    // if we're turning, apply a turn direction by rotating the D vector
+    // if we"re turning, apply a turn direction by rotating the D vector
     let rotationalVelocity = 0;
     // base the amount of rotation based on percentage of top speed. (See the constants above)
     let percentageSpeed = velocity.magnitude / topSpeed;
@@ -82,7 +82,7 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
     const { engineOn, velocity } = car;
 
     // If the thruster is off, break out
-    // or we're at the top speed don't accelerate
+    // or we"re at the top speed don"t accelerate
     if ((!engineOn) || (velocity.magnitude >= topSpeed))
       return;
 
@@ -100,7 +100,7 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
   };
 
   const applyTraction = (car: ICarStateMutable, dt: number) => {
-    // if the car isn't moving, break out
+    // if the car isn"t moving, break out
     if (car.velocity.magnitude < 0.001) {
       return;
     }
@@ -114,7 +114,7 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
     // (just like tires do).
     let amountToCorrect = dt * traction * (-Math.sign(theta));
 
-    // If the amount of correction needed is less that what traction could do, we'll just realign
+    // If the amount of correction needed is less that what traction could do, we"ll just realign
     if (Math.abs(theta) < amountToCorrect)
       amountToCorrect = -theta;
 

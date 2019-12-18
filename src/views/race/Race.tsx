@@ -1,10 +1,10 @@
-import React from 'react';
-import { RSvgContainer } from '../../components/svg/RSvgContainer';
-import { MRace, IMCarRaceState } from '../../core/race/raceMutable';
-import RTrack from './Track';
-import RCar from './Car';
-import { ICarState } from '../../core/race/car';
-import { IRaceState, IRaceCarState } from '../../core/race/race';
+import React from "react";
+import { RSvgContainer } from "../../components/svg/RSvgContainer";
+import { MRace, IMCarRaceState } from "../../core/race/raceMutable";
+import RTrack from "./Track";
+import RCar from "./Car";
+import { ICarState } from "../../core/race/car";
+import { IRaceState, IRaceCarState } from "../../core/race/race";
 
 type IProps = {
   children: IRaceState

@@ -1,9 +1,9 @@
-import Jest from 'jest';
-import { range, zip } from './../core/common';
-import { IBreedFunction, IAProcessGenerationFunction, IASelectionFunctionType } from '../core/AI/ga/gaProcesGenerationFunction';
-import * as math from 'mathjs';
-import { GeneticAlgorithm } from '../core/AI/ga/ga';
-import { IANNInitParams, NeuralNet, IANNData } from '../core/AI/nn/nn';
+import Jest from "jest";
+import { range, zip } from "./../core/common";
+import { IBreedFunction, IAProcessGenerationFunction, IASelectionFunctionType } from "../core/AI/ga/gaProcesGenerationFunction";
+import * as math from "mathjs";
+import { GeneticAlgorithm } from "../core/AI/ga/ga";
+import { IANNInitParams, NeuralNet, IANNData } from "../core/AI/nn/nn";
 
 // todo: vytvořit GANN přímo
 export const _TestGANN = () => {

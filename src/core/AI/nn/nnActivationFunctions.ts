@@ -1,13 +1,11 @@
 import { IFReal } from "../../types";
 
-
 // todo: komentář k enumu
 export enum IANNActivationFunctionType { sigmoid = "sigmoid", tanh = "tanh", relu = "relu" }
 /** function definitions for nn */
 export type IANNActivationFunction = {
-  type: IANNActivationFunctionType
+  type: IANNActivationFunctionType,
 };
-
 
 //todo: odestranit komentář
 /* sigmoid -> výstup [0,1] vahlazený */
@@ -18,7 +16,6 @@ export const relu = (x: number) => x < 0 ? 0 : x;
 
 /* náhrada za sigmoid, mapuje na [-1,1] */
 export const tanh = (x: number) => Math.tanh(x);
-
 
 export const createExecutableFnc = (aFnc: IANNActivationFunction): IFReal => {
   switch (aFnc.type) {

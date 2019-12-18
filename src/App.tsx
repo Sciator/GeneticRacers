@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import Grid from '@material-ui/core/Grid';
-import { GeneticAlgorithm } from './views/GeneticAlgorithm';
-import { UserRace } from './views/race/UserRace';
-import { RRaceNNHistTest } from './views/test/RaceNNHistTest';
-import { RAutoRaceGANN } from './views/race/AutoRaceGANN';
+import Grid from "@material-ui/core/Grid";
+import { GeneticAlgorithm } from "./views/GeneticAlgorithm";
+import { UserRace } from "./views/race/UserRace";
+import { RRaceNNHistTest } from "./views/test/RaceNNHistTest";
+import { RAutoRaceGANN } from "./views/race/AutoRaceGANN";
 
 const App: React.FC = () => {
   

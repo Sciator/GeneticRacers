@@ -1,5 +1,5 @@
-import React from 'react';
-import { ILine } from '../../core/types';
+import React from "react";
+import { ILine } from "../../core/types";
 
 type IProps = {
   children: ILine

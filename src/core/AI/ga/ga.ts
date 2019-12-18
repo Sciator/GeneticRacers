@@ -1,6 +1,6 @@
-import createExecutableFnc from './gaProcesGenerationFunction';
-import { IAProcessGenerationFunction, IBreedFunction } from './gaProcesGenerationFunction';
-import { range } from '../../common';
+import createExecutableFnc from "./gaProcesGenerationFunction";
+import { IAProcessGenerationFunction, IBreedFunction } from "./gaProcesGenerationFunction";
+import { range } from "../../common";
 
 /** function for create initial population */
 export type IInitDNA<DNA> = () => DNA;

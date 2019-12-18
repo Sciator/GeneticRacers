@@ -1,11 +1,11 @@
-import React from 'react';
-import { RRaceNNHist } from './RaceNNHist';
-import { initRaceGANN, raceGANNGetHist, evalRaceGANN } from '../../core/raceAI/raceGANN';
-import { IRaceNNArg } from '../../core/raceAI/raceNN';
-import { IANNData } from '../../core/AI/nn/nn';
-import { Point } from '../../core/types';
-import track01 from '../../core/race/testingTracks/track01';
-import { range } from '../../core/common';
+import React from "react";
+import { RRaceNNHist } from "./RaceNNHist";
+import { initRaceGANN, raceGANNGetHist, evalRaceGANN } from "../../core/raceAI/raceGANN";
+import { IRaceNNArg } from "../../core/raceAI/raceNN";
+import { IANNData } from "../../core/AI/nn/nn";
+import { Point } from "../../core/types";
+import track01 from "../../core/race/testingTracks/track01";
+import { range } from "../../core/common";
 
 const raceSettings: IRaceNNArg = {
   nn: {} as IANNData,

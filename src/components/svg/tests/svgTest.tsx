@@ -1,9 +1,9 @@
-import React from 'react';
-import { RSvgContainer } from '../RSvgContainer';
-import { RPolygon } from '../RPolygon';
-import { Poly, Line } from '../../../core/types';
-import { RPoint } from '../RPoint';
-import { RLine } from '../RLine';
+import React from "react";
+import { RSvgContainer } from "../RSvgContainer";
+import { RPolygon } from "../RPolygon";
+import { Poly, Line } from "../../../core/types";
+import { RPoint } from "../RPoint";
+import { RLine } from "../RLine";
 
 
 export const SvgTest = () => {

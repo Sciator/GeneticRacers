@@ -1,22 +1,22 @@
 export const keyState = {
-  'up': false,
-  'down': false,
-  'left': false,
-  'right': false,
+  "up": false,
+  "down": false,
+  "left": false,
+  "right": false,
 };
 
 const keyCodeMap = {
-  38: 'up',
-  40: 'down',
-  37: 'left',
-  39: 'right',
+  38: "up",
+  40: "down",
+  37: "left",
+  39: "right",
 };
 
 let registered = false;
 
 const register = () => {
   if (!registered) {
-    document.addEventListener('keydown', (event) => {
+    document.addEventListener("keydown", (event) => {
       const direction = (keyCodeMap as any)[event.keyCode];
       if (direction === undefined) {
         return;
@@ -25,7 +25,7 @@ const register = () => {
       (keyState as any)[direction] = true;
     });
 
-    document.addEventListener('keyup', function (event) {
+    document.addEventListener("keyup", function (event) {
       var direction = (keyCodeMap as any)[event.keyCode];
       if (direction === undefined) {
         return;

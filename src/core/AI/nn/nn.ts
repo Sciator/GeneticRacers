@@ -1,7 +1,7 @@
-import { IANNActivationFunction, IANNActivationFunctionType, createExecutableFnc } from './nnActivationFunctions';
-import * as math from 'mathjs';
-import { random } from 'mathjs';
-import { range } from '../../common';
+import { IANNActivationFunction, IANNActivationFunctionType, createExecutableFnc } from "./nnActivationFunctions";
+import * as math from "mathjs";
+import { random } from "mathjs";
+import { range } from "../../common";
 
 /** layer scheme for creating new nn */
 export type IANNInitParams = {
@@ -34,29 +34,36 @@ export type IANNData = {
 
 export class NeuralNet {
   /** values of nn */
-  readonly values: IANNDataValues;
-  readonly functions: {
+  public readonly values: IANNDataValues;
+  public readonly functions: {
     hidden: IANNActivationFunction,
     output: IANNActivationFunction,
   };
 
+  /** creates predict function for given nn */
+  public readonly predict = (input: number[]): number[] => {
+    const { functions: { hidden: hidd, output: out }, values } = this;
 
-  constructor(nn: {
-    values: IANNDataValues,
-    functions: {
-      hidden: IANNActivationFunction,
-      output: IANNActivationFunction,
-    }
-  }) {
-    const { functions, values } = nn;
+    const hidden = createExecutableFnc(hidd);
+    const output = createExecutableFnc(out);
 
-    this.functions = functions;
-    this.values = values;
+    let current = [input];
+    const { biases, weights } = values;
+
+    range(biases.length).forEach(i => {
+      current = math.multiply(current, weights[i]) as number[][];
+      current = math.add(current, [biases[i]]) as number[][];
+      if (i !== weights.length - 1) {
+        current = current.map(x => x.map(hidden));
+      }
+    });
+
+    current = current.map(x => x.map(output));
+    return current[0];
   }
 
-
   /** initialize new nn with given layer schema (and random values) */
-  public static create(nnInitParams: IANNInitParams): NeuralNet {
+  public static create = (nnInitParams: IANNInitParams): NeuralNet => {
     const out = {
       values: { biases: [] as number[][], weights: [] as number[][][] },
       functions: {
@@ -83,26 +90,17 @@ export class NeuralNet {
     return new NeuralNet(out);
   }
 
-  /** creates predict function for given nn */
-  public predict(input: number[]): number[] {
-    const { functions: { hidden, output }, values } = this;
+  constructor(nn: {
+    values: IANNDataValues,
+    functions: {
+      hidden: IANNActivationFunction,
+      output: IANNActivationFunction,
+    }
+  }) {
+    const { functions, values } = nn;
 
-    const _hidden = createExecutableFnc(hidden);
-    const _output = createExecutableFnc(output);
-
-    let current = [input];
-    const { biases, weights } = values;
-
-    range(biases.length).forEach(i => {
-      current = math.multiply(current, weights[i]) as number[][];
-      current = math.add(current, [biases[i]]) as number[][];
-      if (i !== weights.length - 1) {
-        current = current.map(x => x.map(_hidden));
-      }
-    });
-
-    current = current.map(x => x.map(_output));
-    return current[0];
+    this.functions = functions;
+    this.values = values;
   }
 }
 

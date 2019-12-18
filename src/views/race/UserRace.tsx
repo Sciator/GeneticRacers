@@ -1,12 +1,12 @@
-import React from 'react';
-import { keyState } from '../../core/Keys';
-import { MRace } from '../../core/race/raceMutable';
-import track01 from '../../core/race/testingTracks/track01';
-import { Point } from '../../core/types';
-import { Track } from '../../core/race/track';
-import RRace from './Race';
-import { carInputsSetter, ICarInputs, ETurnDirection } from '../../core/race/car';
-import { calculateSensorDetection } from '../../core/raceAI/sensor';
+import React from "react";
+import { keyState } from "../../core/Keys";
+import { MRace } from "../../core/race/raceMutable";
+import track01 from "../../core/race/testingTracks/track01";
+import { Point } from "../../core/types";
+import { Track } from "../../core/race/track";
+import RRace from "./Race";
+import { carInputsSetter, ICarInputs, ETurnDirection } from "../../core/race/car";
+import { calculateSensorDetection } from "../../core/raceAI/sensor";
 
 type IProps = {
 

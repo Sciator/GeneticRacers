@@ -1,5 +1,5 @@
-import { range } from '../../common';
-import * as math from 'mathjs';
+import { range } from "../../common";
+import * as math from "mathjs";
 
 type GAPopulation<DNA> = readonly {
   readonly fitness: number,

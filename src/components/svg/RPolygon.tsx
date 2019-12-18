@@ -1,5 +1,5 @@
-import React from 'react';
-import { IPoly, Poly, IPoint } from '../../core/types';
+import React from "react";
+import { IPoly, Poly, IPoint } from "../../core/types";
 
 type IProps = {
   children: IPoly | Poly

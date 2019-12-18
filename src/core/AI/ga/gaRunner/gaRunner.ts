@@ -8,6 +8,11 @@ export type IAGAExternalFunctions<DNA> = {
   breed: IBreedFunction<DNA>,
 };
 
+const a = (a: number) => {
+
+}
+a(10);
+
 export type IAGARunner<DNA> = {
   /** size of population */
   popSize: number,
@@ -28,7 +33,7 @@ export class MGARunner<DNA> {
   public _functions: IAGAExternalFunctions<DNA>;
 
   public get fitnessValues() {
-    return this.data.generations.map(x => Math.max(...x.map(y => y.fitness)))
+    return this.data.generations.map((x) => Math.max(...x.map((y) => y.fitness)))
   }
 
   public get currentGenerationFitness() {
@@ -36,15 +41,16 @@ export class MGARunner<DNA> {
   }
 
   public get lastGeneration() {
-    const { generations } = this.data;
+    const { generations, } = this.data;
     return generations[generations.length - 1] || null;
   }
 
   public calculateNextGeneration() {
-    const { breed, environment, init } = this._functions;
-    const { gaProcessFunction, generations } = this.data;
+    const { breed, environment, init, } = this._functions;
+    const { gaProcessFunction, generations, } = this.data;
     if (generations.length === 0) {
-      const population = GeneticAlgorithm.gaCreateData({ _function: { environment, init }, popSize: this.data.popSize });
+      const population =
+        GeneticAlgorithm.gaCreateData({ _function: { environment, init, }, popSize: this.data.popSize, });
       generations.push(population);
     } else {
       const evaluator = GeneticAlgorithm.createGAEvaluator({ gaProcessFunction, _function: { breed, environment } })
@@ -54,7 +60,7 @@ export class MGARunner<DNA> {
   }
 
   constructor(args: IAGARunner<DNA>) {
-    const { _functions, popSize, gaProcessFunction } = args;
+    const { _functions, popSize, gaProcessFunction, } = args;
     this._functions = _functions;
 
     this.data = { gaProcessFunction, popSize, generations: [] }

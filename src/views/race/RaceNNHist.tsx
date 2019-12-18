@@ -1,7 +1,7 @@
-import React from 'react';
-import RRace from './Race';
-import { IRaceNNHist } from '../../core/raceAI/raceNN';
-import { raceGetCurrentScore } from '../../core/race/race';
+import React from "react";
+import RRace from "./Race";
+import { IRaceNNHist } from "../../core/raceAI/raceNN";
+import { raceGetCurrentScore } from "../../core/race/race";
 
 type IProps = {
   history: IRaceNNHist,
