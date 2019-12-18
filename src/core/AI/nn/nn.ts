@@ -22,30 +22,51 @@ type IANNDataValues = {
   biases: number[][],
 }
 
-/** full nn with activation afunction */
 export type IANNData = {
-  values: IANNDataValues,
-  afunction: {
+  readonly values: IANNDataValues;
+  readonly functions: {
     hidden: IANNActivationFunction,
     output: IANNActivationFunction,
   }
-}
-// in -> *weights -> +bias -> hidd-fnc -> ...
+};
+
+// in -> *weights -> +bias -> hidd-fnc -> ... -> output
+
+export class NeuralNet {
+  /** values of nn */
+  readonly values: IANNDataValues;
+  readonly functions: {
+    hidden: IANNActivationFunction,
+    output: IANNActivationFunction,
+  };
 
 
-export abstract class NeuralNet {
+  constructor(nn: {
+    values: IANNDataValues,
+    functions: {
+      hidden: IANNActivationFunction,
+      output: IANNActivationFunction,
+    }
+  }) {
+    const { functions, values } = nn;
+
+    this.functions = functions;
+    this.values = values;
+  }
+
+
   /** initialize new nn with given layer schema (and random values) */
-  public static nnCreate(nnInitParams: IANNInitParams): IANNData {
+  public static create(nnInitParams: IANNInitParams): NeuralNet {
     const out = {
-      values: { biases: [], weights: [] },
-      afunction: {
+      values: { biases: [] as number[][], weights: [] as number[][][] },
+      functions: {
         hidden: { type: IANNActivationFunctionType.tanh },
         output: { type: IANNActivationFunctionType.sigmoid },
       }
-    } as IANNData;
+    };
 
     if (nnInitParams.afunction) {
-      out.afunction = nnInitParams.afunction;
+      out.functions = nnInitParams.afunction;
     }
 
     const { hiddens, inputs: input, outputs: output } = nnInitParams.layerScheme;
@@ -59,29 +80,29 @@ export abstract class NeuralNet {
 
     out.values.biases = [...hiddens, output].map(x => range(x).map(() => random(-1, 1)));
 
-    return out;
+    return new NeuralNet(out);
   }
 
   /** creates predict function for given nn */
-  public static nnPredicter(nndata: IANNData): ((x: number[]) => number[]) {
-    const hidden = createExecutableFnc(nndata.afunction.hidden);
-    const output = createExecutableFnc(nndata.afunction.output);
+  public predict(input: number[]): number[] {
+    const { functions: { hidden, output }, values } = this;
 
-    return (input: number[]) => {
-      let current = [input];
-      const { biases, weights } = nndata.values;
+    const _hidden = createExecutableFnc(hidden);
+    const _output = createExecutableFnc(output);
 
-      range(biases.length).forEach(i => {
-        current = math.multiply(current, weights[i]) as number[][];
-        current = math.add(current, [biases[i]]) as number[][];
-        if (i !== weights.length - 1) {
-          current = current.map(x => x.map(hidden));
-        }
-      });
+    let current = [input];
+    const { biases, weights } = values;
 
-      current = current.map(x => x.map(output));
-      return current[0];
-    }
+    range(biases.length).forEach(i => {
+      current = math.multiply(current, weights[i]) as number[][];
+      current = math.add(current, [biases[i]]) as number[][];
+      if (i !== weights.length - 1) {
+        current = current.map(x => x.map(_hidden));
+      }
+    });
+
+    current = current.map(x => x.map(_output));
+    return current[0];
   }
 }
 

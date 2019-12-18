@@ -1,8 +1,9 @@
-import { range } from '../../common';
-import { GeneticAlgorithm, IAGAInitArgs, IAGAEvaluator } from './ga';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import jest from 'jest';
+import { range } from '../../common';
+import { GeneticAlgorithm } from './ga';
 import * as math from 'mathjs';
-import { IASelectionFunctionType } from './gaProcesGenerationFunction';
+import { IASelectionFunctionType, IAProcessGenerationFunction } from './gaProcesGenerationFunction';
 
 const alpha = "abcdefghijklmnopqrstuvwxyz ";
 
@@ -14,51 +15,35 @@ describe("Genetic algorithm", () => {
     const text = "simple text blah blah";
 
     const textL = text.length;
-    const _initFnc = () => range(textL).map(getRandomChar).join('');
+    const _init = () => range(textL).map(getRandomChar).join('');
 
-    const _env = (w: string) =>
+    const _environment = (w: string) =>
       math.mean(range(textL).map(x => text[x] === w[x]).map(x => x ? 1 : 0));
 
     const _breed = (w: string[], mr: number) => {
       const [f] = w;
-      return f.split('').map(x=> mr >= Math.random() ? getRandomChar() : x).join('');
+      return f.split('').map(x => mr >= Math.random() ? getRandomChar() : x).join('');
     };
 
+    const popSize = 100;
 
-    const gaInit: IAGAInitArgs<string> = {
-      popSize: 100,
-
-      _function: {
-        init: _initFnc,
-        environment: _env,
-      }
-    };
-
-    const gaEvaluator: IAGAEvaluator<string> = {
-      gaProcessFunction: {
-        selection:{
-          type: IASelectionFunctionType.percent,
-          value: 10,
-        },
-        mutationRate: .1,
-        breedingParents: 1,
-        canBreedSelf: false,
+    const gaProcessFunction: IAProcessGenerationFunction = {
+      selection: {
+        type: IASelectionFunctionType.percent,
+        value: 10,
       },
-      _function: {
-        environment: _env,
-        breed: _breed,
-      }
+      mutationRate: .1,
+      breedingParents: 1,
+      canBreedSelf: false,
     };
 
-    let gaData = GeneticAlgorithm.gaCreateData(gaInit);
-
-    const evaluator = GeneticAlgorithm.createGAEvaluator(gaEvaluator);
+    let ga = GeneticAlgorithm.create({ _breed, _environment, _init })({ popSize });
 
     range(200).forEach(() => {
-      gaData = evaluator(gaData);
+      ga = ga.calculateNextGen(gaProcessFunction);
     })
 
-    expect(gaData[0].dna).toBe(text);
+    expect(ga.population[0].dna).toBe(text);
   });
 
   //todo: breed multiple together test

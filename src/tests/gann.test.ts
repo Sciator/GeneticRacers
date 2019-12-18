@@ -1,13 +1,9 @@
+import Jest from 'jest';
 import { range, zip } from './../core/common';
 import { IBreedFunction, IAProcessGenerationFunction, IASelectionFunctionType } from '../core/AI/ga/gaProcesGenerationFunction';
-import { IAGAEvaluator } from '../core/AI/ga/ga';
-import Jest from 'jest';
-
-import { IANNData } from '../core/AI/nn/nn';
-import { IANNInitParams, NeuralNet } from '../core/AI/nn/nn';
-import { GeneticAlgorithm } from '../core/AI/ga/ga';
-import { number } from 'prop-types';
 import * as math from 'mathjs';
+import { GeneticAlgorithm } from '../core/AI/ga/ga';
+import { IANNInitParams, NeuralNet, IANNData } from '../core/AI/nn/nn';
 
 // todo: vytvořit GANN přímo
 export const _TestGANN = () => {
@@ -43,10 +39,11 @@ export const _TestGANN = () => {
     layerScheme: layers,
   };
 
-  const init = () => NeuralNet.nnCreate(nnParams);
-  const environment = (nnData: IANNData) => {
-    const predicter = NeuralNet.nnPredicter(nnData);
-    const predictedOutputs = input.map(predicter);
+  const _init = () => NeuralNet.create(nnParams);
+  
+  const _environment = (nnData: IANNData) => {
+    const nn = new NeuralNet(nnData);
+    const predictedOutputs = input.map(nn.predict);
     const differences = zip(predictedOutputs, output)
       .map(([p, o]) => p.map((x, i) => Math.abs(x - o[i])))
       ;
@@ -55,15 +52,15 @@ export const _TestGANN = () => {
 
     return 1 - mean;
   };
-  const breed: IBreedFunction<IANNData> = (data, mr) => {
-    const { afunction, values: { biases, weights } } = data[0];
+  const _breed: IBreedFunction<IANNData> = (data, mr) => {
+    const { functions, values: { biases, weights } } = data[0];
 
     const modif = (x: number) => Math.random() <= mr ? x + Math.random() - 0.5 : x;
     const modifArr = (x: number[]) => x.map(xx => modif(xx));
     const modifArrArr = (x: number[][]) => x.map(xx => modifArr(xx));
 
     return {
-      afunction,
+      functions,
       values: {
         biases: biases.map(modifArr),
         weights: weights.map(modifArrArr),
@@ -72,21 +69,8 @@ export const _TestGANN = () => {
   };
 
 
-  let gaData = GeneticAlgorithm.gaCreateData<IANNData>({
-    popSize,
-    _function: {
-      init,
-      environment,
-    }
-  });
-
-  const evaluator = GeneticAlgorithm.createGAEvaluator({
-    gaProcessFunction,
-    _function: {
-      breed, environment
-    },
-  });
-
+  let ga = GeneticAlgorithm.create({_breed,_environment,_init})({popSize});
+  
   const compareResults = (res: number[][]) => {
     return zip(res, output)
       .map(([a, b]) =>
@@ -96,10 +80,10 @@ export const _TestGANN = () => {
   };
 
   const evalBest = () => {
-    const bestDna = gaData[0].dna;
-    const predicter = NeuralNet.nnPredicter(bestDna);
+    const bestDna = ga.population[0].dna;
+    const nn = new NeuralNet(bestDna);
     const bestDnaResults = input
-      .map(predicter)
+      .map(nn.predict)
       ;
     const resultsRounded = bestDnaResults
       .map(x => x.map(Math.round))
@@ -111,7 +95,7 @@ export const _TestGANN = () => {
   
   let i = 0
   for (; i < numberOfGenerations; i++) {
-    gaData = evaluator(gaData);
+    ga = ga.calculateNextGen(gaProcessFunction);
     if (compareResults(evalBest()))
       break;
   }

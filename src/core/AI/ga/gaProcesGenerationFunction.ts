@@ -1,6 +1,10 @@
 import { range } from '../../common';
-import { IAGADataPopulation } from './ga';
 import * as math from 'mathjs';
+
+type GAPopulation<DNA> = readonly {
+  readonly fitness: number,
+  readonly dna: DNA,
+}[]
 
 export type IBreedFunction<DNA> = (dna: DNA[], mutationRate: number) => DNA;
 
@@ -22,15 +26,15 @@ export type IASelectionFunction = {
   value: number,
 };
 
-type ISelectionFunction<DNA> = (pop: IAGADataPopulation<DNA>) => DNA[];
+type ISelectionFunction<DNA> = (pop: GAPopulation<DNA>) => DNA[];
 /** create function for selecting most fittest dna */
 export function createExecutableFncSelection<DNA>(aargs: IASelectionFunction): ISelectionFunction<DNA> {
 
   switch (aargs.type) {
     case IASelectionFunctionType.fixed:
-      return (pop: IAGADataPopulation<DNA>) => pop.slice(0, aargs.value).map(x => x.dna);
+      return (pop: GAPopulation<DNA>) => pop.slice(0, aargs.value).map(x => x.dna);
     case IASelectionFunctionType.percent:
-      return (pop: IAGADataPopulation<DNA>) => {
+      return (pop: GAPopulation<DNA>) => {
         const val = Math.floor(pop.length * aargs.value / 100);
         return pop.slice(0, val).map(x => x.dna)
       };
@@ -48,7 +52,7 @@ const createExecutableFnc = (aFnc: IAProcessGenerationFunction) => {
 
   return <DNA>(breedFnc: IBreedFunction<DNA>) => {
 
-    return (pop: IAGADataPopulation<DNA>) => {
+    return (pop: GAPopulation<DNA>) => {
       const popLen = pop.length;
       const selectionFunction = createExecutableFncSelection<DNA>(selection);
       const preparedForBreeding = selectionFunction(pop);

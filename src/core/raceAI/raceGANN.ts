@@ -1,6 +1,6 @@
 import { ICreateRaceNeuralNet, IRaceNNArg, createRaceNN, evalRaceNN } from "./raceNN";
 import { IANNData } from "../AI/nn/nn";
-import { IAGADataPopulation, IAGAInitArgs, IAGAEvaluator, GeneticAlgorithm } from "../AI/ga/ga";
+import { IAGADataPopulation, IAGAInitArgs, GAEvaluator, GeneticAlgorithm } from "../AI/ga/ga";
 import { IANNActivationFunction } from "../AI/nn/nnActivationFunctions";
 import { raceGetCurrentScore } from "../race/race";
 import { IASelectionFunctionType } from "../AI/ga/gaProcesGenerationFunction";
@@ -61,14 +61,14 @@ export const evalRaceGANN = (data: IRaceGANNData): IRaceGANNData => {
   }
 
   const breed = ([nn]: IANNData[], mr: number) => {
-    const { afunction, values: { biases, weights } } = nn;
+    const { functions, values: { biases, weights } } = nn;
 
     const modif = (x: number) => Math.random() <= mr ? x + Math.random() - 0.5 : x;
     const modifArr = (x: number[]) => x.map(modif);
     const modifArrArr = (x: number[][]) => x.map(modifArr);
 
     return {
-      afunction,
+      functions,
       values: {
         biases: biases.map(modifArr),
         weights: weights.map(modifArrArr),
@@ -76,7 +76,7 @@ export const evalRaceGANN = (data: IRaceGANNData): IRaceGANNData => {
     }
   };
 
-  const gaEvaluator: IAGAEvaluator<IANNData> = {
+  const gaEvaluator: GAEvaluator<IANNData> = {
     gaProcessFunction: {
       selection: {
         type: IASelectionFunctionType.percent,
@@ -91,7 +91,7 @@ export const evalRaceGANN = (data: IRaceGANNData): IRaceGANNData => {
     }
   };
 
-  const evaluator = GeneticAlgorithm.createGAEvaluator(gaEvaluator);
+  const evaluator = GeneticAlgorithm(gaEvaluator);
 
   const evaledData = evaluator(pop);
 
