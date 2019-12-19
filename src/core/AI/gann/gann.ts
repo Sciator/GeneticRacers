@@ -1,6 +1,7 @@
 import { NeuralNet, IANNData, IANNInitParams } from "../nn/nn";
 import { GeneticAlgorithm, IGAFunctions, IEnvironment, IGAInitArgs } from "../ga/ga";
 import { throwReturn } from "../../common";
+import { IAProcessGenerationFunction } from "../ga/gaProcesGenerationFunction";
 
 
 export type IGeneticAlgorithmNeuralNetInit =
@@ -15,7 +16,15 @@ export type IGeneticAlgorithmNeuralNetInit =
 export class GeneticAlgorithmNeuralNet {
   public readonly ga: GeneticAlgorithm<NeuralNet>;
 
-  public static readonly create = (params: IGeneticAlgorithmNeuralNetInit) => {
+  public evalByBest(inputs: number[]){
+    return this.ga.population[0].dna.predict(inputs);
+  }
+
+  public calculateNextGen(evalFunctions: IAProcessGenerationFunction): GeneticAlgorithmNeuralNet {
+    return new GeneticAlgorithmNeuralNet(this.ga.calculateNextGen(evalFunctions));
+  }
+
+  public static create(params: IGeneticAlgorithmNeuralNetInit) {
     const { _environment, nnInit, gaInit } = params;
 
     const gaFunctions: IGAFunctions<NeuralNet> = {

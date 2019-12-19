@@ -1,13 +1,14 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Jest from "jest";
-import { zip } from "./../core/common";
-import { IBreedFunction, IAProcessGenerationFunction, IASelectionFunctionType } from "../core/AI/ga/gaProcesGenerationFunction";
 import * as math from "mathjs";
-import { GeneticAlgorithm } from "../core/AI/ga/ga";
-import { IANNInitParams, NeuralNet } from "../core/AI/nn/nn";
+import { IAProcessGenerationFunction, IASelectionFunctionType } from "../ga/gaProcesGenerationFunction";
+import { IANNInitParams, NeuralNet } from "../nn/nn";
+import { GeneticAlgorithmNeuralNet } from "./gann";
+import { IEnvironment, IGAInitArgs } from "../ga/ga";
+import { zip } from "../../common";
 
-describe("gann old", () => {
-  it("should learn simple binary function old",
+describe("gann", () => {
+  it("should learn simple binary function",
     () => {
       const trainingSet = [
         [[0, 0], [0]],
@@ -18,32 +19,23 @@ describe("gann old", () => {
       const hiddenLayers: number[] = [5, 10, 5];
       const numberOfGenerations: number = 200;
 
-      const popSize = 100;
-      const gaProcessFunction: IAProcessGenerationFunction = {
-        breedingParents: 1,
-        mutationRate: 1,
-        selection: {
-          type: IASelectionFunctionType.fixed,
-          value: 10,
+
+      const gaInit: IGAInitArgs = {
+        popSize: 100,
+      };
+
+      const nnInit: IANNInitParams = {
+        layerScheme: {
+          inputs: trainingSet[0][0].length,
+          hiddens: hiddenLayers,
+          outputs: trainingSet[0][1].length,
         },
       };
 
       const input = trainingSet.map(([i, o]) => i);
       const output = trainingSet.map(([i, o]) => o);
 
-      const layers = {
-        inputs: trainingSet[0][0].length,
-        hiddens: hiddenLayers,
-        outputs: trainingSet[0][1].length,
-      };
-
-      const nnParams: IANNInitParams = {
-        layerScheme: layers,
-      };
-
-      const _init = () => NeuralNet.create(nnParams);
-
-      const _environment = (nn: NeuralNet) => {
+      const _environment: IEnvironment<NeuralNet> = (nn: NeuralNet) => {
         const predictedOutputs = input.map((x) => nn.predict(x));
         const differences = zip(predictedOutputs, output)
           .map(([p, o]) => p.map((x, i) => Math.abs(x - o[i])))
@@ -54,12 +46,19 @@ describe("gann old", () => {
         return 1 - mean;
       };
 
-      const _breed: IBreedFunction<NeuralNet> = (data, mr) => {
-        return data[0].mutate(mr);
+      let gann = GeneticAlgorithmNeuralNet.create({ _environment, gaInit, nnInit });
+
+
+      const gaProcessFunction: IAProcessGenerationFunction = {
+        breedingParents: 1,
+        mutationRate: 1,
+        selection: {
+          type: IASelectionFunctionType.fixed,
+          value: 10,
+        },
       };
 
 
-      let ga = GeneticAlgorithm.create({ _breed, _environment, _init })({ popSize });
 
       const compareResults = (res: number[][]) =>
         zip(res, output)
@@ -70,10 +69,8 @@ describe("gann old", () => {
 
 
       const evalBest = () => {
-        const bestDna = ga.population[0].dna;
-        const nn = new NeuralNet(bestDna);
         const bestDnaResults = input
-          .map((x) => nn.predict(x))
+          .map((x) => gann.evalByBest(x))
           ;
         const resultsRounded = bestDnaResults
           .map((x) => x.map(Math.round))
@@ -85,7 +82,7 @@ describe("gann old", () => {
 
       let generationNum = 0;
       for (; generationNum < numberOfGenerations; generationNum++) {
-        ga = ga.calculateNextGen(gaProcessFunction);
+        gann = gann.calculateNextGen(gaProcessFunction);
         if (compareResults(evalBest()))
           break;
       }
