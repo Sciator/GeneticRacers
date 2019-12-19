@@ -1,64 +1,68 @@
-import { IAProcessGenerationFunction, IBreedFunction } from "../gaProcesGenerationFunction";
-import { IDNAInit, IEnvironment, GeneticAlgorithm } from "../ga";
+// todo odebrat
+export {};
 
 
-export type IAGAExternalFunctions<DNA> = {
-  init: IDNAInit<DNA>,
-  environment: IEnvironment<DNA>,
-  breed: IBreedFunction<DNA>,
-};
+// import { IAProcessGenerationFunction, IBreedFunction } from "../gaProcesGenerationFunction";
+// import { IDNAInit, IEnvironment, GeneticAlgorithm } from "../ga";
 
-export type IAGARunner<DNA> = {
-  /** size of population */
-  popSize: number,
-  /** functions for select and modify population */
-  gaProcessFunction: IAProcessGenerationFunction,
-  /** non-serializable external functions */
-  _functions: IAGAExternalFunctions<DNA>,
-};
 
-export type IMGARunner<DNA> = {
-  popSize: number,
-  generations: IAGADataPopulation<DNA>[],
-  gaProcessFunction: IAProcessGenerationFunction,
-};
+// export type IAGAExternalFunctions<DNA> = {
+//   init: IDNAInit<DNA>,
+//   environment: IEnvironment<DNA>,
+//   breed: IBreedFunction<DNA>,
+// };
 
-export class MGARunner<DNA> {
-  public data: IMGARunner<DNA>;
-  public _functions: IAGAExternalFunctions<DNA>;
+// export type IAGARunner<DNA> = {
+//   /** size of population */
+//   popSize: number,
+//   /** functions for select and modify population */
+//   gaProcessFunction: IAProcessGenerationFunction,
+//   /** non-serializable external functions */
+//   _functions: IAGAExternalFunctions<DNA>,
+// };
 
-  public get fitnessValues() {
-    return this.data.generations.map((x) => Math.max(...x.map((y) => y.fitness)))
-  }
+// export type IMGARunner<DNA> = {
+//   popSize: number,
+//   generations: IAGADataPopulation<DNA>[],
+//   gaProcessFunction: IAProcessGenerationFunction,
+// };
 
-  public get currentGenerationFitness() {
-    return this.fitnessValues[this.fitnessValues.length - 1] || 0;
-  }
+// export class MGARunner<DNA> {
+//   public data: IMGARunner<DNA>;
+//   public _functions: IAGAExternalFunctions<DNA>;
 
-  public get lastGeneration() {
-    const { generations, } = this.data;
-    return generations[generations.length - 1] || null;
-  }
+//   public get fitnessValues() {
+//     return this.data.generations.map((x) => Math.max(...x.map((y) => y.fitness)))
+//   }
 
-  public calculateNextGeneration() {
-    const { breed, environment, init, } = this._functions;
-    const { gaProcessFunction, generations, } = this.data;
-    if (generations.length === 0) {
-      const population =
-        GeneticAlgorithm.gaCreateData({ _function: { environment, init, }, popSize: this.data.popSize, });
-      generations.push(population);
-    } else {
-      const evaluator = GeneticAlgorithm.createGAEvaluator({ gaProcessFunction, _function: { breed, environment } })
-      const population = evaluator(this.lastGeneration);
-      generations.push(population);
-    }
-  }
+//   public get currentGenerationFitness() {
+//     return this.fitnessValues[this.fitnessValues.length - 1] || 0;
+//   }
 
-  constructor(args: IAGARunner<DNA>) {
-    const { _functions, popSize, gaProcessFunction, } = args;
-    this._functions = _functions;
+//   public get lastGeneration() {
+//     const { generations, } = this.data;
+//     return generations[generations.length - 1] || null;
+//   }
 
-    this.data = { gaProcessFunction, popSize, generations: [], };
-  }
-}
+//   public calculateNextGeneration() {
+//     const { breed, environment, init, } = this._functions;
+//     const { gaProcessFunction, generations, } = this.data;
+//     if (generations.length === 0) {
+//       const population =
+//         GeneticAlgorithm.gaCreateData({ _function: { environment, init, }, popSize: this.data.popSize, });
+//       generations.push(population);
+//     } else {
+//       const evaluator = GeneticAlgorithm.createGAEvaluator({ gaProcessFunction, _function: { breed, environment } })
+//       const population = evaluator(this.lastGeneration);
+//       generations.push(population);
+//     }
+//   }
+
+//   constructor(args: IAGARunner<DNA>) {
+//     const { _functions, popSize, gaProcessFunction, } = args;
+//     this._functions = _functions;
+
+//     this.data = { gaProcessFunction, popSize, generations: [], };
+//   }
+// }
 

@@ -60,16 +60,16 @@ export const RRaceNNHist: React.FC<IProps> = ({ history: { dt, history }, onHist
     <div style={{ whiteSpace: "revert" }}>
       {JSON.stringify(timeFromStart)}
       <br />
-      {JSON.stringify(race.car.carState.engineOn)}
-      {JSON.stringify(race.car.carState.turnDirection)}
+      {JSON.stringify(race.cars.carState.engineOn)}
+      {JSON.stringify(race.cars.carState.turnDirection)}
       <br />
       {JSON.stringify(raceGetCurrentScore(race))}
       <br />
-      {JSON.stringify(race.car.carState.pos)}
+      {JSON.stringify(race.cars.carState.pos)}
       <br />
-      {JSON.stringify(race.car.raceState)}
+      {JSON.stringify(race.cars.raceState)}
       <br />
-      {JSON.stringify(race.car.currentCheckpoint)}
+      {JSON.stringify(race.cars.currentCheckpoint)}
     </div>
   </>);
 }

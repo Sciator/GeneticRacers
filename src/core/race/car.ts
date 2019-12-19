@@ -5,14 +5,22 @@ const BEST_TURN_SPEED = 0.3;
 const TURN_AT_TOP_SPEED = 0.75;
 
 export type ICarPhysicsOptions = {
-  readonly topSpeed?: number,
-  readonly acceleration?: number,
-  readonly handling?: number,
-  readonly traction?: number,
-  readonly friction?: number,
+  topSpeed?: number,
+  acceleration?: number,
+  handling?: number,
+  traction?: number,
+  friction?: number,
 };
 
-const defaultCarPhysicsOptions = {
+type ICarPhysics = {
+  readonly topSpeed: number,
+  readonly acceleration: number,
+  readonly handling: number,
+  readonly traction: number,
+  readonly friction: number,
+} & ICarPhysicsOptions;
+
+const defaultCarPhysicsOptions: ICarPhysics = {
   acceleration: 250,
   friction: .2,
   handling: 3,
@@ -28,6 +36,14 @@ export type ICarState = {
   readonly engineOn: boolean,
 };
 
+export type ICarStateInit = {
+  readonly pos: Point,
+  readonly velocity?: Point,
+  readonly heading: Point,
+  readonly turnDirection?: 0 | 1 | -1,
+  readonly engineOn?: boolean,
+};
+
 type ICarStateMutable = {
   pos: Point,
   velocity: Point,
@@ -38,19 +54,47 @@ type ICarStateMutable = {
 
 export enum ETurnDirection { left = -1, right = 1, straight = 0 }
 
-export type IFCarEnvironment = (car: ICarState, dt: number) => ICarState;
-
-const carStateMutableCopy = (car: ICarState) => ({ ...car });
-
 export type ICarInputs = { engineOn: boolean, turnDirection: ETurnDirection };
 
-export const carInputsSetter = (car: ICarState, { engineOn, turnDirection }: ICarInputs): ICarState =>
-  ({ ...car, engineOn, turnDirection });
 
-export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment => {
-  const { acceleration, friction, handling, topSpeed, traction } = { ...defaultCarPhysicsOptions, ...(opt || {}) };
+export type ICarInit = {
+  physics?: ICarPhysicsOptions,
+  state: ICarStateInit,
+};
 
-  const updateTurn = (car: ICarStateMutable, dt: number) => {
+export class Car {
+  public readonly physics: ICarPhysics;
+  public readonly state: ICarState;
+
+  public setInput(input: ICarInputs): Car {
+    const { engineOn, turnDirection } = input;
+    const state = { ...this.state, engineOn, turnDirection };
+
+    return new Car({ state, physics: this.physics });
+  }
+
+  public update(dt: number): Car {
+    const { physics } = this;
+    const out = Car.carStateMutableCopy(this.state);
+
+    Car.applyVelocity(physics, out, dt);
+    Car.updateTurn(physics, out, dt);
+    Car.applyAcceleration(physics, out, dt);
+    Car.applyFriction(physics, out, dt);
+    Car.applyTraction(physics, out, dt);
+    return new Car({ physics, state: out });
+  }
+
+
+  //
+  //#region Physics
+  //
+
+  private static carStateMutableCopy(car: ICarState) { return ({ ...car }); }
+
+
+  private static updateTurn(physics: ICarPhysics, car: ICarStateMutable, dt: number) {
+    const { acceleration, friction, handling, topSpeed, traction } = physics;
     const { velocity, turnDirection, heading } = car;
 
     // if we"re turning, apply a turn direction by rotating the D vector
@@ -71,14 +115,15 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
     rotationalVelocity *= turnDirection;
 
     car.heading = heading.rotateRad(rotationalVelocity * dt);
-  };
+  }
 
-  const applyVelocity = (car: ICarStateMutable, dt: number) => {
+  private static applyVelocity(physics: ICarPhysics, car: ICarStateMutable, dt: number) {
     const { velocity, pos } = car;
     car.pos = pos.plus(velocity.multiply(dt));
-  };
+  }
 
-  const applyAcceleration = (car: ICarStateMutable, dt: number) => {
+  private static applyAcceleration(physics: ICarPhysics, car: ICarStateMutable, dt: number) {
+    const { acceleration, friction, handling, topSpeed, traction } = physics;
     const { engineOn, velocity } = car;
 
     // If the thruster is off, break out
@@ -87,17 +132,19 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
 
 
     car.velocity = car.heading.multiply(dt * acceleration);
-  };
+  }
 
-  const applyFriction = (car: ICarStateMutable, dt: number) => {
+  private static applyFriction(physics: ICarPhysics, car: ICarStateMutable, dt: number) {
+    const { acceleration, friction, handling, topSpeed, traction } = physics;
     const { engineOn, velocity } = car;
     // Dont apply friction if the thruster is on
     if (engineOn) return;
 
     car.velocity = velocity.multiply(Math.pow(1 - friction, dt));
-  };
+  }
 
-  const applyTraction = (car: ICarStateMutable, dt: number) => {
+  private static applyTraction(physics: ICarPhysics, car: ICarStateMutable, dt: number) {
+    const { acceleration, friction, handling, topSpeed, traction } = physics;
     // if the car isn"t moving, break out
     if (car.velocity.magnitude < 0.001) {
       return;
@@ -118,17 +165,30 @@ export const createCarEnvironment = (opt?: ICarPhysicsOptions): IFCarEnvironment
 
     // now "fix" velocity by rotating it a little
     car.velocity = car.velocity.rotateRad(amountToCorrect);
-  };
+  }
 
-  return (car: ICarState, dt: number) => {
-    if (car.heading.magnitude === 0) throw new Error("invalid car heading");
+  //
+  //#endregion
+  //
 
-    const out = carStateMutableCopy(car);
-    applyVelocity(out, dt);
-    updateTurn(out, dt);
-    applyAcceleration(out, dt);
-    applyFriction(out, dt);
-    applyTraction(out, dt);
-    return out;
-  };
-};
+
+  public static create({ physics: opts, state: steteInit }: ICarInit) {
+    const physics = { ...defaultCarPhysicsOptions, ...(opts || {}) };
+    const state: ICarState = {
+      engineOn: false, velocity: new Point({ x: 0, y: 0 }), turnDirection: 0,
+      ...steteInit,
+    };
+
+    if (state.heading.magnitude === 0) throw new Error("invalid car heading");
+
+    return new Car({ physics, state });
+  }
+
+  private constructor({ physics, state }: { physics: ICarPhysics, state: ICarState }) {
+    this.physics = physics;
+    this.state = state;
+  }
+
+}
+
+

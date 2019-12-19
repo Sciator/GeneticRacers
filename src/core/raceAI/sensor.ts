@@ -11,24 +11,32 @@ export type ISensorCalculationResult = {
   nearestMapped: number,
 };
 
-export const calculateSensorDetection = (track: Track) => (sensorsRelativePoints: Point[]) => (car: ICarState) =>
-  sensorsRelativePoints.map((sensorRelative) => {
-    const sensorTarget: Point = sensorRelative.rotateRad(car.heading.angleRad).plus(car.pos);
+export class Sensors {
+  public readonly pointsRelative: readonly Point[];
 
-    const sensorLine: Line = new Line({ p1: car.pos, p2: sensorTarget });
+  public calculateSensorDetection(track: Track, car: ICarState) {
+    return this.pointsRelative.map((sensorRelative) => {
+      const sensorTarget: Point = sensorRelative.rotateRad(car.heading.angleRad).plus(car.pos);
 
-    const intersectionPoints = track.road.lines
-      .map((x) => x.Intersection(sensorLine))
-      .filter((x) => x !== undefined
-      ) as Point[];
+      const sensorLine: Line = new Line({ p1: car.pos, p2: sensorTarget });
 
-    const nearestLength = Math.min(...intersectionPoints
-      .concat(sensorTarget)
-      .map((x) => x.distance(car.pos))
-    );
+      const intersectionPoints = track.road.lines
+        .map((x) => x.Intersection(sensorLine))
+        .filter((x) => x !== undefined
+        ) as Point[];
 
-    const nearestMapped = nearestLength / sensorRelative.magnitude;
+      const nearestLength = Math.min(...intersectionPoints
+        .concat(sensorTarget)
+        .map((x) => x.distance(car.pos))
+      );
 
-    return { sensorLine, intersectionPoints, sensorTarget, nearestLength, nearestMapped } as ISensorCalculationResult;
-  });
+      const nearestMapped = nearestLength / sensorRelative.magnitude;
 
+      return { sensorLine, intersectionPoints, sensorTarget, nearestLength, nearestMapped } as ISensorCalculationResult;
+    });
+  }
+
+  public constructor(pointsRelative: Point[]) {
+    this.pointsRelative = pointsRelative;
+  }
+}

@@ -1,24 +1,16 @@
 import { IRaceNNArg, createRaceNN, evalRaceNN } from "./raceNN";
-import { IANNData } from "../AI/nn/nn";
-import { GeneticAlgorithm } from "../AI/ga/ga";
+import { IANNData, NeuralNet } from "../AI/nn/nn";
+import { GeneticAlgorithm, IGAInitArgs } from "../AI/ga/ga";
 import { IANNActivationFunction } from "../AI/nn/nnActivationFunctions";
-import { raceGetCurrentScore } from "../race/race";
+import { Race } from "../race/race";
 import { IASelectionFunctionType } from "../AI/ga/gaProcesGenerationFunction";
+import { GeneticAlgorithmNeuralNet } from "../AI/gann/gann";
+import { Sensors } from "./sensor";
+import { Track } from "../race/track";
+import { ICarPhysicsOptions } from "../race/car";
 
 
-export type IRaceGANNInit = {
-  nnInit: {
-    hiddenLayers: number[],
-    afunction?: {
-      hidden: IANNActivationFunction,
-      output: IANNActivationFunction,
-    },
-  },
 
-  popSize: number,
-
-  raceNN: IRaceNNArg,
-};
 
 export const initRaceGANN = (args: IRaceGANNInit): IRaceGANNData => {
   const { popSize, nnInit: { hiddenLayers }, raceNN } = args;
@@ -31,7 +23,7 @@ export const initRaceGANN = (args: IRaceGANNInit): IRaceGANNData => {
       ...raceNN,
       nn,
     });
-    return raceGetCurrentScore({ car: raceRes.race.car, track: raceNN.track });
+    return raceGetCurrentScore({ car: raceRes.race.cars, track: raceNN.track });
   };
 
   const gaData = GeneticAlgorithm.gaCreateData({ _function: { environment, init }, popSize });
@@ -57,7 +49,7 @@ export const evalRaceGANN = (data: IRaceGANNData): IRaceGANNData => {
       ...raceNN,
       nn,
     });
-    return raceGetCurrentScore({ car: raceRes.race.car, track: raceNN.track });
+    return raceGetCurrentScore({ car: raceRes.race.cars, track: raceNN.track });
   };
 
   const breed = ([nn]: IANNData[], mr: number) => {
@@ -102,14 +94,78 @@ export const evalRaceGANN = (data: IRaceGANNData): IRaceGANNData => {
 };
 
 
-export const raceGANNGetHist = (data: IRaceGANNData) => {
-  const { pop, raceNN } = data;
-
-  return pop.map(x => {
-    const raceRes = evalRaceNN({
-      ...raceNN,
-      nn: x.dna,
-    });
-    return raceRes;
-  });
+export type IRaceGANNInit = {
+  nnInit: {
+    hiddenLayers: number[],
+    afunction?: {
+      hidden: IANNActivationFunction,
+      output: IANNActivationFunction,
+    },
+  },
+  gaInit: {
+    popSize: number,
+  },
+  race: {
+    track: Track,
+    carTemplate: {
+      sensors: Sensors[],
+      carPhysics?: ICarPhysicsOptions,
+    }
+  }
 };
+
+type IRaceGANNState = {
+  gann: GeneticAlgorithmNeuralNet,
+  race: Race,
+  sensors: readonly Sensors[],
+}
+
+
+export class RaceGANN {
+  public readonly gann: GeneticAlgorithmNeuralNet;
+  public readonly race: Race;
+  public readonly sensors: readonly Sensors[];
+
+
+  public create(init: IRaceGANNInit) {
+    const { gaInit: { popSize },
+      nnInit: { afunction, hiddenLayers },
+      race: { carTemplate: { sensors, carPhysics }, track },
+    } = { ...init };
+
+    const _environment = (nn: NeuralNet) => {
+      const { race:{cars,track,setInputs}, sensors } = this;
+      
+      setInputs()
+    };
+
+    const layerScheme = {
+      inputs: sensors.length,
+      hiddens: hiddenLayers,
+      outputs: 3,
+    }
+
+    const gann = GeneticAlgorithmNeuralNet.create({
+      _environment,
+      gaInit: { popSize },
+      nnInit: { layerScheme, afunction }
+    });
+
+    return new RaceGANN({
+      gann,
+      race,
+      sensors
+    })
+
+  }
+
+  private constructor(state: IRaceGANNState) {
+    const { gann, race, sensors } = state;
+    this.gann = gann;
+    this.race = race;
+    this.sensors = sensors;
+  }
+}
+
+
+

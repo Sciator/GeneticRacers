@@ -11,7 +11,7 @@ type IProps = {
 };
 
 const RRace: React.FC<IProps> = ({ children: race }) => {
-  const { car, track } = race;
+  const { cars: car, track } = race;
   return <>
     <RSvgContainer>
       <RTrack>{track}</RTrack>

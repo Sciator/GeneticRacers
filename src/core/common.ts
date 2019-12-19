@@ -7,7 +7,7 @@ export const range: {
   return [...new Array(m - n).keys()].map((x) => x + n);
 };
 
-export const zip = <T1, T2>(arr1: T1[], arr2: T2[]): [T1, T2][] =>
+export const zip = <T1, T2>(arr1: T1[] | readonly T1[], arr2: T2[] | readonly T2[]): [T1, T2][] =>
   range(arr1.length).map(x => [arr1[x], arr2[x]]) as [T1, T2][];
 
 /** use inside reduce to flatten array (1 level flattening) */
