@@ -79,9 +79,6 @@ export class GeneticAlgorithm<DNA> {
   ) {
     this._functions = fncs;
     this.population = GeneticAlgorithm.sortMostFitFirst(pop);
-
-    const { calculateNextGen } = this;
-    [calculateNextGen].forEach(x => x.bind(this));
   }
 }
 

@@ -75,7 +75,7 @@ export class NeuralNet {
   }
 
   /** initialize new nn with given layer schema (and random values) */
-  public static create(nnInitParams: IANNInitParams): NeuralNet{
+  public static create(nnInitParams: IANNInitParams): NeuralNet {
     const out = {
       values: { biases: [] as number[][], weights: [] as number[][][] },
       functions: {
@@ -112,9 +112,6 @@ export class NeuralNet {
 
     this.functions = functions;
     this.values = values;
-
-    const {mutate,predict} = this;
-    [mutate, predict].forEach(x=>x.bind(this));
   }
 }
 

@@ -60,9 +60,6 @@ export class Point {
   constructor({ x, y }: IPoint) {
     this.x = x;
     this.y = y;
-
-    const { distance, minus, multiply, plus, rotateRad } = this;
-    [distance, minus, multiply, plus, rotateRad].forEach(__ => __.bind(this));
   }
 }
 

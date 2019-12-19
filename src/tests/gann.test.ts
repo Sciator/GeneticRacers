@@ -4,7 +4,7 @@ import { zip } from "./../core/common";
 import { IBreedFunction, IAProcessGenerationFunction, IASelectionFunctionType } from "../core/AI/ga/gaProcesGenerationFunction";
 import * as math from "mathjs";
 import { GeneticAlgorithm } from "../core/AI/ga/ga";
-import { IANNInitParams, NeuralNet, IANNData } from "../core/AI/nn/nn";
+import { IANNInitParams, NeuralNet } from "../core/AI/nn/nn";
 
 // todo: vytvořit GANN přímo
 export const _TestGANN = () => {
@@ -42,9 +42,8 @@ export const _TestGANN = () => {
 
   const _init = () => NeuralNet.create(nnParams);
 
-  const _environment = (nnData: IANNData) => {
-    const nn = new NeuralNet(nnData);
-    const predictedOutputs = input.map(nn.predict);
+  const _environment = (nn: NeuralNet) => {
+    const predictedOutputs = input.map((x) => nn.predict(x));
     const differences = zip(predictedOutputs, output)
       .map(([p, o]) => p.map((x, i) => Math.abs(x - o[i])))
       ;
@@ -53,20 +52,9 @@ export const _TestGANN = () => {
 
     return 1 - mean;
   };
-  const _breed: IBreedFunction<IANNData> = (data, mr) => {
-    const { functions, values: { biases, weights } } = data[0];
 
-    const modif = (x: number) => Math.random() <= mr ? x + Math.random() - 0.5 : x;
-    const modifArr = (x: number[]) => x.map((xx) => modif(xx));
-    const modifArrArr = (x: number[][]) => x.map((xx) => modifArr(xx));
-
-    return {
-      functions,
-      values: {
-        biases: biases.map(modifArr),
-        weights: weights.map(modifArrArr),
-      },
-    };
+  const _breed: IBreedFunction<NeuralNet> = (data, mr) => {
+    return data[0].mutate(mr);
   };
 
 
@@ -84,7 +72,7 @@ export const _TestGANN = () => {
     const bestDna = ga.population[0].dna;
     const nn = new NeuralNet(bestDna);
     const bestDnaResults = input
-      .map(nn.predict)
+      .map((x) => nn.predict(x))
       ;
     const resultsRounded = bestDnaResults
       .map((x) => x.map(Math.round))
