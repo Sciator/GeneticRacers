@@ -3,38 +3,37 @@ import { IAProcessGenerationFunction, IBreedFunction } from "./gaProcesGeneratio
 import { range } from "../../common";
 
 /** function for create initial population */
-export type IInitDNA<DNA> = () => DNA;
+export type IDNAInit<DNA> = () => DNA;
 /** simulation environment returns fitness */
 export type IEnvironment<DNA> = (dna: DNA) => number;
 
-export type IAGAInitArgs = {
+export type IGAInitArgs = {
   /** size of population */
   popSize: number,
 };
 
 /** non-serializable GA functions */
-export type GAFunctions<DNA> = {
-  readonly _init: IInitDNA<DNA>;
+export type IGAFunctions<DNA> = {
+  readonly _init: IDNAInit<DNA>;
   readonly _environment: IEnvironment<DNA>;
   readonly _breed: IBreedFunction<DNA>;
 };
 
 /** population sorted by fittest */
-type GAPopulation<DNA> = readonly {
+type IGAPopulation<DNA> = readonly {
   readonly fitness: number,
   readonly dna: DNA,
 }[];
 
-export class GeneticAlgorithm<DNA> {
-  private readonly _functions: GAFunctions<DNA>;
 
-  /** creates sorted copy of DNA array */
-  private static sortMostFitFirst<DNA>(pop: GAPopulation<DNA>) {
-    const cpy = [...pop,]; cpy.sort(({ fitness: a, }, { fitness: b, }) => -(a - b)); return cpy;
-  }
+
+export class GeneticAlgorithm<DNA> {
+  /** non-serializable GA functions */
+  private readonly _functions: IGAFunctions<DNA>;
 
   /** population sorted by fittest */
-  public readonly population: GAPopulation<DNA>;
+  public readonly population: IGAPopulation<DNA>;
+
 
   /** returns function that create new population based on fitness value and selection+ */
   public calculateNextGen(evalFunctions: IAProcessGenerationFunction) {
@@ -54,27 +53,35 @@ export class GeneticAlgorithm<DNA> {
   }
 
   /** function for create initial random DNAs */
-  public static readonly create = <DNA>(fncs: GAFunctions<DNA>) => (ainitArgs: IAGAInitArgs): GeneticAlgorithm<DNA> => {
-    const { popSize, _init, _environment, } = { ...ainitArgs, ...fncs, };
+  public static create<DNA>(fncs: IGAFunctions<DNA>) {
+    return (ainitArgs: IGAInitArgs): GeneticAlgorithm<DNA> => {
+      const { popSize, _init, _environment, } = { ...ainitArgs, ...fncs, };
 
-    return new GeneticAlgorithm<DNA>(
-      fncs,
-      GeneticAlgorithm.sortMostFitFirst(
+      return new GeneticAlgorithm<DNA>(
+        fncs,
         range(popSize)
           .map(_init)
           .map((x) => ({ fitness: _environment(x), dna: x, }))
-      )
-    );
+      );
+    };
   }
 
-  private constructor(fncs: {
-    _init: IInitDNA<DNA>,
+  /** creates sorted copy of DNA array */
+  private static sortMostFitFirst<DNA>(pop: IGAPopulation<DNA>) {
+    const cpy = [...pop,]; cpy.sort(({ fitness: a, }, { fitness: b, }) => -(a - b)); return cpy;
+  }
+
+  constructor(fncs: {
+    _init: IDNAInit<DNA>,
     _environment: IEnvironment<DNA>,
     _breed: IBreedFunction<DNA>,
-  }, pop: GAPopulation<DNA>
+  }, pop: IGAPopulation<DNA>
   ) {
     this._functions = fncs;
-    this.population = pop;
+    this.population = GeneticAlgorithm.sortMostFitFirst(pop);
+
+    const { calculateNextGen } = this;
+    [calculateNextGen].forEach(x => x.bind(this));
   }
 }
 

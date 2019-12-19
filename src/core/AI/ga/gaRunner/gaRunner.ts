@@ -1,9 +1,9 @@
 import { IAProcessGenerationFunction, IBreedFunction } from "../gaProcesGenerationFunction";
-import { IInitDNA, IEnvironment, GeneticAlgorithm } from "../ga";
+import { IDNAInit, IEnvironment, GeneticAlgorithm } from "../ga";
 
 
 export type IAGAExternalFunctions<DNA> = {
-  init: IInitDNA<DNA>,
+  init: IDNAInit<DNA>,
   environment: IEnvironment<DNA>,
   breed: IBreedFunction<DNA>,
 };

@@ -11,9 +11,8 @@ describe("neural net", () => {
           layerScheme: { inputs: y, hiddens: [20], outputs: y, },
         };
 
-        const nn = NeuralNet.nnCreate(nnparamsTsst);
-        const predict = NeuralNet.nnPredicter(nn);
-        const a = predict(range(y).map(() => random(-1, 1)));
+        const nn = NeuralNet.create(nnparamsTsst);
+        nn.predict(range(y).map(() => random(-1, 1)));
       });
     });
   });

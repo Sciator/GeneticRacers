@@ -13,4 +13,4 @@ export class Track {
     this.road = road;
     this.checkpoints = checkpoints;
   }
-};
+}

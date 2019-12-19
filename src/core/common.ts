@@ -17,3 +17,7 @@ export const flatReducer = <T>(a: T[], b: T[]) => a.concat(b);
 export const splitToChunks = <T>(arr: T[], chunkSize: number): T[][] => range(Math.ceil(arr.length / chunkSize))
   .map((x) => arr.slice(x * chunkSize, (x + 1) * chunkSize))
   ;
+
+export const throwReturn = <T>(message: string): T => {
+  throw new Error(message);
+};

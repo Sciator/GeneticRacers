@@ -8,24 +8,24 @@ export class Point {
   public readonly x: number;
   public readonly y: number;
 
-  public readonly plus = (other: Point) => {
+  public plus(other: Point) {
     const { x, y } = this;
     const { x: ox, y: oy } = other;
     return new Point({ x: x + ox, y: y + oy });
   }
 
-  public readonly minus = (other: Point) => {
+  public minus(other: Point) {
     const { x, y } = this;
     const { x: ox, y: oy } = other;
     return new Point({ x: x - ox, y: y - oy });
   }
 
-  public readonly multiply = (multiplier: number) => {
+  public multiply(multiplier: number) {
     const { x, y } = this;
     return new Point({ x: x * multiplier, y: y * multiplier });
   }
 
-  public readonly rotateRad = (radians: number): Point => {
+  public rotateRad(radians: number): Point {
     const { x, y } = this;
     const [cosTheta, sinTheta] = [Math.cos(radians), Math.sin(radians)];
 
@@ -60,6 +60,9 @@ export class Point {
   constructor({ x, y }: IPoint) {
     this.x = x;
     this.y = y;
+
+    const { distance, minus, multiply, plus, rotateRad } = this;
+    [distance, minus, multiply, plus, rotateRad].forEach(__ => __.bind(this));
   }
 }
 
@@ -142,6 +145,9 @@ export class Line {
   constructor({ p1, p2 }: ILine) {
     this.p1 = p1 instanceof Point ? p1 : new Point(p1);
     this.p2 = p2 instanceof Point ? p2 : new Point(p2);
+
+    const {Intersection,distanceFromPoint} = this;
+    [Intersection,distanceFromPoint].forEach(__=>__.bind(this));
   }
 }
 
