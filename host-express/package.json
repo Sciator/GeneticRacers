@@ -1,0 +1,21 @@
+{
+  "main": "index.js",
+  "scripts": {
+    "build": "npm i && npm run build-cli && pkg .",
+    "build-cli": "cd ../ui/ && npm run build",
+    "install": "cd ../ui/ && npm i"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "open": "^7.0.0"
+  },
+  "bin": "index.js",
+  "pkg": {
+    "assets": [
+      "../ui/build/**/*"
+    ],
+    "targets": [
+      "node8"
+    ]
+  }
+}
