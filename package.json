@@ -7,7 +7,7 @@
     "postinstall": "run-p install:*",
     "install:server": "yarn --cwd server install",
     "install:ui": "yarn --cwd ui install",
-    "ci": "yarn install --ignore-scripts --frozen-lockfile & run-s ci:*",
+    "ci": "yarn install --ignore-scripts --frozen-lockfile && run-s ci:*",
     "ci:server": "yarn --cwd server install --frozen-lockfile",
     "ci:ui": "yarn --cwd ui install --frozen-lockfile",
     "build": "run-p build:*",
