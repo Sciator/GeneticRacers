@@ -67,10 +67,3 @@ controls:
 Pressing Start will start algorithmic calculations (can take some time). Plot wiht maximal fitnesses is shown when algorithm is done running.
 
 Clicking item in list will start replay
-
-
-# TODO
- - [X] fix building scripts
- - [ ] fix vscode debug
- - [ ] add electron building
- - [ ] delete this list (replace with issues)
