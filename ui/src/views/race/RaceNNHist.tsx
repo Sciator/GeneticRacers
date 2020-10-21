@@ -36,7 +36,10 @@ export const RRaceNNHist: React.FC<IProps> = ({ history }) => {
   React.useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current as number);
+  // todo: find better solution
+  /* eslint-disable */
   }, []);
+  /* eslint-enable */
 
   return (<>
     <div style={{ height: 300, width: 300 }}>
