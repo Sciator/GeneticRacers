@@ -9,8 +9,10 @@
 /coverage
 
 # production
-/build
-/dist
+**/build/
+**/*.js
+**/temp/
+**/dist/
 
 # misc
 .DS_Store
@@ -25,5 +27,4 @@ yarn-error.log*
 
 
 # Project specific
-
 

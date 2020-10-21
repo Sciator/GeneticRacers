@@ -4,7 +4,7 @@
 - yarn installed (if npm present use `npm install -g yarn`)
 
 ## Building executable
- - Run `yarn build`
+ - Run `yarn dist`
  - Executable is located inside dist folder
 
 

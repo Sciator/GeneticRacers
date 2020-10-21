@@ -70,8 +70,7 @@ export class RaceCar {
 
   private static calculateIsCarCrashed(roads: Line[], car: Car) {
     const { state: { pos } } = car;
-    for (const i of Array(roads.length).keys()) {
-      const r = roads[i];
+    for (const r of roads) {
       if (r.distanceFromPoint(pos) <= collisionMinDist)
         return true;
     }

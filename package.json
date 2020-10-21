@@ -1,5 +1,40 @@
 {
+  "name": "genetic-racers",
+  "private":"true",
+  "version": "0.0.0-development",
   "scripts": {
-    "build": "yarn i && cd ./host-express/ && yarn build"
+    "script": "cd ./scripts/ && ts-node-script",
+    "postinstall": "run-p install:*",
+    "install:server": "yarn --cwd server install",
+    "install:ui": "yarn --cwd ui install",
+    "ci": "yarn install --ignore-scripts --frozen-lockfile & run-s ci:*",
+    "ci:server": "yarn --cwd server install --frozen-lockfile",
+    "ci:ui": "yarn --cwd ui install --frozen-lockfile",
+    "build": "run-p build:*",
+    "build:ui": "yarn --cwd ui build",
+    "build:server": "yarn --cwd server build",
+    "dist": "yarn ci && run-s build \"script dist\"",
+    "dev": "run-p dev:*",
+    "dev:server": "yarn --cwd server dev",
+    "dev:ui": "yarn --cwd ui dev",
+    "semantic-release": "semantic-release",
+    "lint": "tslint -c tslint.json ./{ui/src,server/src,common}/**/*.ts{,x}",
+    "lint:fix": "yarn lint --fix"
+  },
+  "devDependencies": {
+    "@types/node": "^14.11.1",
+    "npm-run-all": "^4.1.5",
+    "pkg": "^4.4.9",
+    "semantic-release": "^17.1.2",
+    "ts-node": "^9.0.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sciator/GeneticRacers.git"
+  },
+  "release": {
+    "assets": "dist/*"
   }
 }

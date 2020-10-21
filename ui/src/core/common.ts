@@ -1,10 +1,17 @@
 export const range: {
-  (size: number): number[];
-  (min: number, max: number): number[];
-} = (n: number, m?: number): number[] => {
-  if (!m)
-    return [...new Array(n).keys()];
-  return [...new Array(m - n).keys()].map((x) => x + n);
+  /** creates array with numbers from 0 to max-1 */
+  (maxExcluded: number): number[];
+  /** creates array with numbers from min to max-1 */
+  (minIncluded: number, maxExcluded: number): number[];
+} = (a: number, b?: number): number[] => {
+  const arr = [];
+  if (b === undefined)
+    for (let i = 0; i < a; i++)
+      arr.push(i);
+  else
+    for (let i = a; i < b; i++)
+      arr.push(i);
+  return arr;
 };
 
 export const zip = <T1, T2>(arr1: T1[] | readonly T1[], arr2: T2[] | readonly T2[]): [T1, T2][] =>
