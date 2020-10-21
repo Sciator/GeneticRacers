@@ -53,7 +53,7 @@
     "arrow-parens": false,
     "no-for-in": true,
     "no-internal-module": true,
-    "no-magic-numbers": true,
+    "no-magic-numbers": false,
     "no-non-null-assertion": true,
     "no-parameter-reassignment": true,
     "no-var-requires": true,

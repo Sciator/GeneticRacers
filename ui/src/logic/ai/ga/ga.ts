@@ -87,7 +87,7 @@ export class GeneticAlgorithm<DNA> {
       return new GeneticAlgorithm<DNA>(
         { _breed: fncs._breed, _init: fncs._init, _environmentBatch },
         zip(pop, fitnesses)
-          .map(([dna, fitness]) => ({ fitness, dna })),
+          .map(([dna, fitness]) => ({ fitness, dna }))
       );
     };
   }

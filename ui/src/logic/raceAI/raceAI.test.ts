@@ -1,4 +1,5 @@
-import Jest from 'jest';
+// tslint:disable: no-console
+import {} from "jest";
 import { RaceGANN } from "./raceGANN";
 import { IASelectionFunctionType } from "../ai/ga/gaProcesGenerationFunction";
 import { Sensors } from "./sensor";
@@ -18,7 +19,7 @@ test("raceGANN", () => {
           type: IASelectionFunctionType.percent,
           value: 10,
         },
-      }
+      },
     },
     nnInit: { hiddenLayers: [5, 5] },
     raceParams: {

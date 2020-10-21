@@ -1,5 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import Jest from "jest";
+// tslint:disable: no-console
+import {} from "jest";
 import * as math from "mathjs";
 import { IAProcessGenerationFunction, IASelectionFunctionType } from "../ga/gaProcesGenerationFunction";
 import { IANNInitParams, NeuralNet } from "../nn/nn";

@@ -65,7 +65,7 @@ export class RaceNN {
     while (time < maxTime && !race.isEnded) {
       time += dt;
       race = this.evalRaceStep(race);
-      hist.push(race)
+      hist.push(race);
     }
 
     return hist;
