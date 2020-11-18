@@ -1,6 +1,5 @@
 import React from "react";
 import { RaceHist } from "./GUI";
-import { ListItem, List, ListItemText, Paper } from "@material-ui/core";
 
 type IProps = {
   list: RaceHist[],
@@ -10,7 +9,7 @@ type IProps = {
 
 export const RaceList: React.FC<IProps> = ({ list, onSelect }) => {
   return <>
-    <Paper style={{ height:"100vh", width: 200, overflowY: "scroll" }}>
+    {/* <Paper style={{ height:"100vh", width: 200, overflowY: "scroll" }}>
       <List>
         {list.map(x =>
           <ListItem button onClick={() => { onSelect(x); }}>
@@ -18,6 +17,6 @@ export const RaceList: React.FC<IProps> = ({ list, onSelect }) => {
           </ListItem>
         )}
       </List>
-    </Paper>
+    </Paper> */}
   </>;
 };

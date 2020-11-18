@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Paper, TextField, Grid, Button, Slider, Typography, Select, MenuItem } from "@material-ui/core";
 import { IASelectionFunctionType } from "../../logic/ai/ga/gaProcesGenerationFunction";
 import { ETracks, getTrack } from "../../logic/race/tracks/tracks";
 import { Track } from "../../logic/race/track";
@@ -44,7 +43,7 @@ export const RaceMenu: React.FC<IProps> = ({ onStart }) => {
   };
 
   return <>
-    <Paper style={{ padding: 20, height: "100%" }} square>
+    {/* <Paper style={{ padding: 20, height: "100%" }} square>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <TextField
@@ -99,7 +98,6 @@ export const RaceMenu: React.FC<IProps> = ({ onStart }) => {
             <MenuItem value={IASelectionFunctionType.percent}>Percent</MenuItem>
             {/*
             <MenuItem value={IASelectionFunctionType.fixed}>Fixed</MenuItem>
-             */}
           </Select>
         </Grid>
         <Grid item xs={12} >
@@ -162,6 +160,7 @@ export const RaceMenu: React.FC<IProps> = ({ onStart }) => {
         </Grid>
       </Grid>
     </Paper>
+  */}
   </>;
 };
 
