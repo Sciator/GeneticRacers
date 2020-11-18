@@ -1,10 +1,34 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
+import "antd/dist/antd.css";
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(<>
+  <style>
+    {`
+      @font-face {
+        font-family: 'Rubik';
+        src: local('Rubik'), url(fonts/Rubik.woff) format('woff');
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      * {
+        font-family: Rubik, source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+          monospace;
+      }
+`}
+  </style>
+  <App />
+</>, document.getElementById("root"));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
