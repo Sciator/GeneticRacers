@@ -93,13 +93,16 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
       });
 
       Events.on(render, "afterRender", () => {
-        const res = game.sensor(0);
-        const playerPos = game.mapping.players[0].position;
+        [0,1].forEach(pi=>{
+          const res = game.sensor(pi);
+          const playerPos = game.mapping.players[pi].position;
 
-        if (res?.point) {
-          renderPoint(render, res.point);
-          renderLine(render, playerPos, res.point);
-        }
+          res.forEach(res => {
+            renderPoint(render, res);
+            renderLine(render, playerPos, res);
+          });
+        })
+
       });
 
       keyCaptureStart();

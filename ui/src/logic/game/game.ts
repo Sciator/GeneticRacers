@@ -1,8 +1,15 @@
 import { Engine, World, Bodies, Query, Vector, Composite, Body } from "matter-js";
 import { raycast } from "../../core/raycast";
 
+const frictionAir = .3;
+
+export type BodyType = "wall" | "player" | "bullet" | "obstacle";
 
 export type GameSettings = {
+  ai: {
+    sensorSidesArrayAngle: number[],
+    sensorMaxRange: number,
+  },
   game: {
     playerSize: number,
   },
@@ -19,8 +26,10 @@ export type GameSettings = {
 export type GameInputPlayer = {
   walk: boolean,
   rotate: number,
-  fire: boolean,
-  switchWeapon: number,
+  /** use item/fire weapon */
+  use: boolean,
+  /** select item/weapon */
+  switch: number,
 };
 
 export type GameInput = {
@@ -31,16 +40,16 @@ export type GameInput = {
 export type GameStatePlayer = {
   health: number,
   ammo: number[],
-  weapon: {
+  item: {
     /**
-     * index of selected weapon
+     * index of selected item/weapon
      */
     selected: number,
     /**
-     * after shooting this number is how to long it takes to shoot/swithch weapon again
+     * after shooting this number is how to long it takes to shoot/use/swithch item/weapon again
      * 0 means shooting is possible
      */
-    relodingTime: number,
+    cooldown: number,
   },
   position: {
     x: number,
@@ -56,6 +65,7 @@ export type GameState = {
 
 const mergeSettings = (s: GameSettings, t: Partial<GameSettings>): GameSettings =>
   ({
+    ai: { ...s.ai, ...t?.ai },
     game: { ...s.game, ...t?.game },
     map: { ...s.map, ...t?.map },
     simulation: { ...s.simulation, ...t?.simulation },
@@ -71,11 +81,16 @@ export class Game {
   public mapping: {
     /** index of body in this array is same with index in game state */
     players: Matter.Body[],
+    walls: Matter.Body[],
   };
 
   public static readonly SETTINGS_DEFAULT: Readonly<GameSettings> = {
+    ai: {
+      sensorSidesArrayAngle: [Math.PI * 1 / 4, Math.PI * 1 / 8, Math.PI * 1 / 32],
+      sensorMaxRange: 200,
+    },
     map: {
-      size: 200,
+      size: 300,
       borders: 10,
     },
     game: {
@@ -101,7 +116,7 @@ export class Game {
 
     const mergeInput = () => ({
       players: this.gameState.players.map((_, i) => ({
-        fire: false, rotate: 0, switchWeapon: -1, walk: false,
+        use: false, rotate: 0, switch: -1, walk: false,
         ...(userInput?.players?.[i]),
       })),
     });
@@ -136,25 +151,39 @@ export class Game {
 
   public sensor(playerIndex: number) {
     const {
-      settings: { map: { size } },
+      settings: {
+        map: { size },
+        ai: {
+          sensorMaxRange, sensorSidesArrayAngle,
+        } },
       gameState: { players },
     } = this;
     const player = players[playerIndex];
     const playerEngineBody = this.mapping.players[playerIndex];
 
-    const rayLengt = size * Math.pow(2, 1 / 2);
+    const sensorAngles = [0]
+      .concat(sensorSidesArrayAngle)
+      .concat(sensorSidesArrayAngle.map(x => -x))
+      .map(x => player.position.angle + x)
+      ;
 
+    const rayRange = Math.min(size * Math.pow(2, 1 / 2), sensorMaxRange);
     const playerVector = Vector.create(player.position.x, player.position.y);
-
     const bodies = Composite.allBodies(this.world as any).filter(({ id }) => id !== playerEngineBody.id);
-    return { point: raycast(bodies, playerVector, Vector.rotate(Vector.create(1, 0), player.position.angle), rayLengt)?.point };
+
+    return sensorAngles.map(x => {
+      const ray = raycast(bodies, playerVector, Vector.rotate(Vector.create(1, 0), x), rayRange);
+      if (!ray?.point)
+        return Vector.add(playerVector, Vector.mult(Vector.normalise(Vector.rotate(Vector.create(1, 0), x)), rayRange));
+      else
+        return ray.point;
+    });
   }
 
   constructor(userSettings: Partial<GameSettings> = {}) {
-    // create engine
     const settings = this.settings = mergeSettings(Game.SETTINGS_DEFAULT, userSettings);
-    const engine = this.engine = Engine.create();
-
+    // create engine
+    this.engine = Engine.create();
     const world = this.world;
 
     world.gravity.y = 0;
@@ -162,31 +191,35 @@ export class Game {
 
     const { map: { size, borders }, game: { playerSize } } = settings;
     const center = size / 2;
-
-    World.add(world, Bodies.rectangle(0, center, borders * 2, size, { isStatic: true }));
-    World.add(world, Bodies.rectangle(size, center, borders * 2, size, { isStatic: true, angle: Math.PI }));
-    World.add(world, Bodies.rectangle(center, 0, size, borders * 2, { isStatic: true, angle: Math.PI }));
-    World.add(world, Bodies.rectangle(center, size, size, borders * 2, { isStatic: true }));
-
     const playerPadding = 5;
     const playerFromBorder = borders + playerSize + playerPadding;
 
 
-    const frictionAir = .3;
-    const p1 = Bodies.circle(size - playerFromBorder, playerFromBorder, playerSize, { frictionAir, angle: Math.PI * 3 / 4 });
-    World.add(world, p1);
-    const p2 = Bodies.circle(playerFromBorder, size - playerFromBorder, playerSize, { frictionAir, angle: Math.PI * (-1 / 4) });
-    World.add(world, p2);
+
+    const walls = [
+      Bodies.rectangle(0, center, borders * 2, size, { isStatic: true }),
+      Bodies.rectangle(size, center, borders * 2, size, { isStatic: true, angle: Math.PI }),
+      Bodies.rectangle(center, 0, size, borders * 2, { isStatic: true, angle: Math.PI }),
+      Bodies.rectangle(center, size, size, borders * 2, { isStatic: true }),
+    ];
+    World.add(world, walls);
+
+    const players = [
+      Bodies.circle(size - playerFromBorder, playerFromBorder, playerSize, { frictionAir, angle: Math.PI * 3 / 4 }),
+      Bodies.circle(playerFromBorder, size - playerFromBorder, playerSize, { frictionAir, angle: Math.PI * (-1 / 4) }),
+    ];
+    World.add(world, players);
 
     this.mapping = {
-      players: [p1, p2],
+      players,
+      walls,
     };
 
     this.gameState = {
-      players: [p1, p2].map(({ position: { x, y }, angle }) =>
+      players: players.map(({ position: { x, y }, angle }) =>
         ({
           ammo: [], health: 1,
-          weapon: { relodingTime: 0, selected: 0 },
+          item: { cooldown: 0, selected: 0 },
           position: { x, y, angle },
         } as GameStatePlayer)),
     };
