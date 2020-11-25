@@ -9,7 +9,7 @@ type TMainPageProps = {
 
 };
 
-export const MainPage: React.FC<TMainPageProps> = ({ }) => {
+export const MainPage: React.FC<TMainPageProps> = () => {
 
   return <>
     <Card>

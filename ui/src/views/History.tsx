@@ -5,7 +5,7 @@ type THistoryProps = {
 
 };
 
-export const History: React.FC<THistoryProps> = ({ }) => {
+export const History: React.FC<THistoryProps> = () => {
 
   return <>
     <Card title="History"></Card>

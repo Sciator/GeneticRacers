@@ -6,7 +6,7 @@ type TSettingsProps = {
 
 };
 
-export const Settings: React.FC<TSettingsProps> = ({ }) => {
+export const Settings: React.FC<TSettingsProps> = () => {
 
   return <>
     <Card title="Settings" style={{ overflowY: "auto", height: "100%" }}>

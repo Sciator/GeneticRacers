@@ -5,7 +5,7 @@ type TAnalyzeProps = {
 
 };
 
-export const Analyze: React.FC<TAnalyzeProps> = ({ }) => {
+export const Analyze: React.FC<TAnalyzeProps> = () => {
 
   return <>
     <Card title="Analyze"></Card>

@@ -1,4 +1,4 @@
-import { Engine, World, Bodies, Query, Vector, Composite, Body } from "matter-js";
+import { Engine, World, Bodies, Vector, Composite, Body } from "matter-js";
 import { raycast } from "../../core/raycast";
 
 const frictionAir = .3;
@@ -102,7 +102,7 @@ export class Game {
   };
 
   public next(userInput?: Partial<GameInput>) {
-    const { engine, settings: { simulation: { delta } }, mapping } = this;
+    const { engine, settings: { simulation: { delta } } } = this;
     this.applyInput(userInput);
 
     Engine.update(engine, delta);

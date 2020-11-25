@@ -52,7 +52,7 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
   const ref = useRef<HTMLDivElement>(undefined as any);
   const debug = false;
 
-  useEffect(() => {
+  const init = () => {
     (async () => {
       if (!ref.current)
         return;
@@ -132,7 +132,8 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
       requestAnimationFrame(rafLoop);
 
     })();
-  }, []);
+  };
+  useEffect(init, []);
 
   return <>
     <div style={{ justifyContent: "center", display: "flex" }}>
@@ -141,7 +142,7 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
   </>;
 };
 
-export const RunnerPage: React.FC<TRunnerProps> = ({ }) => {
+export const RunnerPage: React.FC<TRunnerProps> = () => {
 
   return <>
     <Card title="Run">
