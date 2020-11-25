@@ -67,3 +67,8 @@ controls:
 Pressing Start will start algorithmic calculations (can take some time). Plot wiht maximal fitnesses is shown when algorithm is done running.
 
 Clicking item in list will start replay
+
+
+possible inspiration: 
+https://github.com/wagenaartje/neataptic
+https://github.com/CodeReclaimers/neat-python
