@@ -87,6 +87,7 @@
     "quotemark": [
       true,
       "double"
-    ]
+    ],
+    "curly": false
   }
 }

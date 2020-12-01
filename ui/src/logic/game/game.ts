@@ -1,5 +1,6 @@
 import { Engine, World, Bodies, Vector, Composite, Body } from "matter-js";
-import { raycast } from "../../core/raycast";
+import { throwReturn } from "../../core/common";
+import { createSensorExecutor, SensorExecutor } from "./sensors";
 
 const frictionAir = .3;
 
@@ -38,6 +39,8 @@ export type GameInput = {
 
 
 export type GameStatePlayer = {
+  /** player body id inside engine */
+  body: Body,
   health: number,
   ammo: number[],
   item: {
@@ -50,11 +53,6 @@ export type GameStatePlayer = {
      * 0 means shooting is possible
      */
     cooldown: number,
-  },
-  position: {
-    x: number,
-    y: number,
-    angle: number,
   },
 };
 
@@ -74,15 +72,13 @@ const mergeSettings = (s: GameSettings, t: Partial<GameSettings>): GameSettings 
 
 export class Game {
   public engine: Engine;
-  public get world(): World { return this.engine.world; };
+  public get world(): World { return this.engine.world; }
   public settings: GameSettings;
   public gameState: GameState;
 
-  public mapping: {
-    /** index of body in this array is same with index in game state */
-    players: Matter.Body[],
-    walls: Matter.Body[],
-  };
+  public sensorExecutor: SensorExecutor;
+
+
 
   public static readonly SETTINGS_DEFAULT: Readonly<GameSettings> = {
     ai: {
@@ -106,13 +102,11 @@ export class Game {
     this.applyInput(userInput);
 
     Engine.update(engine, delta);
-
-    this.synchronizeGamesState();
   }
 
   /** applies changes to object based on user input */
   private applyInput(userInput?: Partial<GameInput>) {
-    const { mapping } = this;
+    const { gameState: { players } } = this;
 
     const mergeInput = () => ({
       players: this.gameState.players.map((_, i) => ({
@@ -121,10 +115,10 @@ export class Game {
       })),
     });
 
-    const { players } = mergeInput();
+    const { players: playersInputs } = mergeInput();
 
-    players.forEach((x, i) => {
-      const body = mapping.players[i];
+    playersInputs.forEach((x, i) => {
+      const { body } = players[i];
       if (x.walk) {
         let vec = Vector.rotate(Vector.create(1, 0), body.angle);
         vec = Vector.mult(vec, 5);
@@ -136,48 +130,11 @@ export class Game {
     });
   }
 
-  /** apply changes from engine into gameState prop */
-  private synchronizeGamesState() {
-    const { mapping } = this;
-
-    this.gameState.players.forEach((x, i) => {
-      const body = mapping.players[i];
-      x.position.x = body.position.x;
-      x.position.y = body.position.y;
-      x.position.angle = body.angle;
-    });
-  }
-
 
   public sensor(playerIndex: number) {
-    const {
-      settings: {
-        map: { size },
-        ai: {
-          sensorMaxRange, sensorSidesArrayAngle,
-        } },
-      gameState: { players },
-    } = this;
-    const player = players[playerIndex];
-    const playerEngineBody = this.mapping.players[playerIndex];
-
-    const sensorAngles = [0]
-      .concat(sensorSidesArrayAngle)
-      .concat(sensorSidesArrayAngle.map(x => -x))
-      .map(x => player.position.angle + x)
-      ;
-
-    const rayRange = Math.min(size * Math.pow(2, 1 / 2), sensorMaxRange);
-    const playerVector = Vector.create(player.position.x, player.position.y);
-    const bodies = Composite.allBodies(this.world as any).filter(({ id }) => id !== playerEngineBody.id);
-
-    return sensorAngles.map(x => {
-      const ray = raycast(bodies, playerVector, Vector.rotate(Vector.create(1, 0), x), rayRange);
-      if (!ray?.point)
-        return Vector.add(playerVector, Vector.mult(Vector.normalise(Vector.rotate(Vector.create(1, 0), x)), rayRange));
-      else
-        return ray.point;
-    });
+    const { gameState: { players }, sensorExecutor, } = this;
+    const { body } = players?.[playerIndex] ?? throwReturn(`Player with index ${playerIndex} not found!`);
+    return sensorExecutor(body);
   }
 
   constructor(userSettings: Partial<GameSettings> = {}) {
@@ -188,13 +145,10 @@ export class Game {
 
     world.gravity.y = 0;
 
-
     const { map: { size, borders }, game: { playerSize } } = settings;
     const center = size / 2;
     const playerPadding = 5;
     const playerFromBorder = borders + playerSize + playerPadding;
-
-
 
     const walls = [
       Bodies.rectangle(0, center, borders * 2, size, { isStatic: true }),
@@ -210,18 +164,17 @@ export class Game {
     ];
     World.add(world, players);
 
-    this.mapping = {
-      players,
-      walls,
-    };
-
     this.gameState = {
-      players: players.map(({ position: { x, y }, angle }) =>
+      players: players.map((body) =>
         ({
+          body,
           ammo: [], health: 1,
           item: { cooldown: 0, selected: 0 },
-          position: { x, y, angle },
         } as GameStatePlayer)),
     };
+
+
+
+    this.sensorExecutor = createSensorExecutor(this);
   }
 }

@@ -3,6 +3,7 @@ import { Card } from "antd";
 import { Events, Render, Vector } from "matter-js";
 import { Game } from "../logic/game/game";
 import { capturedKeys, keyCaptureStart } from "../core/keycapture";
+import { renderLine, renderPoint } from "../utils/rendererUtils";
 
 type TRunnerProps = {
 
@@ -12,41 +13,6 @@ type TRendererProps = {
   width: number,
   height: number,
 };
-
-const withRender = (render: Render, fnc: (ctx: CanvasRenderingContext2D) => void) => {
-  const context = render.context;
-  (Render as any).startViewTransform(render);
-  fnc(context);
-  (Render as any).endViewTransform(render);
-};
-
-const renderLine = (render: Render, startPoint: Vector, endPoint: Vector) => {
-  return withRender(render, (context) => {
-    context.beginPath();
-    context.moveTo(startPoint.x, startPoint.y);
-    context.lineTo(endPoint.x, endPoint.y);
-
-    context.strokeStyle = "rgba(255,0,0,.7)";
-    context.lineWidth = 1;
-    context.stroke();
-
-    context.fillStyle = "rgba(255,165,0,0.7)";
-    context.fill();
-  });
-};
-
-const renderPoint = (render: Render, point: Vector, size = 5) => {
-  return withRender(render, (context) => {
-    context.beginPath();
-
-    context.ellipse(point.x, point.y, size, size, 0, 0, Math.PI * 2);
-
-    context.fillStyle = "rgba(0,0,255,0.7)";
-    context.fill();
-  });
-};
-
-
 
 const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
   const ref = useRef<HTMLDivElement>(undefined as any);
@@ -95,14 +61,13 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
       Events.on(render, "afterRender", () => {
         [0,1].forEach(pi=>{
           const res = game.sensor(pi);
-          const playerPos = game.mapping.players[pi].position;
+          const playerPos = game.gameState.players[pi].body.position;
 
           res.forEach(res => {
             renderPoint(render, res);
             renderLine(render, playerPos, res);
           });
-        })
-
+        });
       });
 
       keyCaptureStart();
