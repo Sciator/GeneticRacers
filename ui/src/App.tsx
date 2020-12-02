@@ -12,7 +12,7 @@ const App: React.FC = () => {
   return (
     <Layout style={{ width: "100vw", height: "100vh" }}>
       <Header style={{ position: "fixed", zIndex: 1, width: "100%", height: headerHeight, color: "white" }}>
-        Genetic Racers
+        Genetic algorithm
       </Header>
       <Content style={{ padding: contentPadding, paddingTop: headerHeight + contentPadding, }}>
         <MainPage />
