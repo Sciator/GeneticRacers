@@ -110,10 +110,10 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
   </>;
 };
 
-export const RunnerPage: React.FC<TRunnerProps> = () => {
+export const PlayPage: React.FC<TRunnerProps> = () => {
 
   return <>
-    <Card title="Run">
+    <Card title="Play">
       <Renderer {...{ width: 500, height: 500 }} />
     </Card>
   </>;

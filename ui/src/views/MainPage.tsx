@@ -1,7 +1,7 @@
 import { Card, Row, Col } from "antd";
 import React from "react";
 import { Analyze } from "./Analyze";
-import { RunnerPage } from "./Runner";
+import { PlayPage } from "./Play";
 import { Settings } from "./Settings";
 import { History } from "./History";
 
@@ -18,7 +18,7 @@ export const MainPage: React.FC<TMainPageProps> = () => {
           <Settings />
         </Col>
         <Col xxl={8}>
-          <RunnerPage />
+          <PlayPage />
         </Col>
         <Col xxl={8}>
           <Row gutter={[0, 8]} >
