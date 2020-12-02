@@ -1,4 +1,4 @@
-import { Engine, World, Bodies, Vector, Composite, Body } from "matter-js";
+import { Engine, World, Bodies, Vector, Composite, Body, Events } from "matter-js";
 import { throwReturn } from "../../core/common";
 import { createSensorExecutor, SensorExecutor } from "./sensors";
 
@@ -93,6 +93,13 @@ export class Game {
 
   public sensorExecutor: SensorExecutor;
 
+  /** returns game state object from body ID */
+  private getObjFromId(id: number): GameStateObject | undefined {
+    const { bullets, players } = this.gameState;
+    const find = (arr: GameStateObject[]) => arr.find(x => x.body.id === id);
+    const player = find(players); if (player) return player;
+    const bullet = find(bullets); if (bullet) return bullet;
+  }
 
 
   public static readonly SETTINGS_DEFAULT: Readonly<GameSettings> = {
@@ -113,7 +120,11 @@ export class Game {
   };
 
   public next(userInput?: Partial<GameInput>) {
-    const { engine, settings: { simulation: { delta } }, gameState: { players } } = this;
+    const { engine, settings: { simulation: { delta } }, gameState: { players, isGameOver } } = this;
+    if (isGameOver) {
+      console.warn("next called when game is over");
+      return;
+    }
     this.applyInput(userInput);
 
     Engine.update(engine, delta);
@@ -163,6 +174,15 @@ export class Game {
     deadBullets.forEach((x) => {
       World.remove(world, x.body);
       console.log("dead");
+    });
+
+    const deadPlayers = gameState.players.filter(({ health }) => health <= 0);
+    gameState.players = gameState.players.filter(({ health }) => health > 0);
+
+    deadPlayers.forEach((x) => {
+      World.remove(world, x.body);
+      console.log("dead");
+      this.gameState.isGameOver = true;
     });
   };
 
@@ -220,6 +240,31 @@ export class Game {
     return sensorExecutor(body);
   }
 
+  private onCollision(e: Matter.IEventCollision<Engine>) {
+    const { pairs } = e;
+
+    const processColisionPair = (pair: Matter.IPair) => {
+      const bodies = [pair.bodyA, pair.bodyB];
+      const objects = bodies.map(({ id }) => this.getObjFromId(id)) as GameStateObject[];
+      if (objects.some(x => !x)) return;
+
+      const bullet = objects.find(x => x.type === EGameStateObjectType.bullet) as GameStateBullet;
+      const player = objects.find(x => x.type === EGameStateObjectType.player) as GameStatePlayer;
+
+      if (bullet) {
+        if (player) {
+          const damage = bullet.health / 3;
+          player.health -= damage;
+          bullet.health -= damage;
+        } else if (objects[1].type === EGameStateObjectType.bullet) {
+          objects.forEach(x => x.health /= 2)
+        }
+      }
+    }
+
+    pairs.forEach(processColisionPair);
+  }
+
   constructor(userSettings: Partial<GameSettings> = {}) {
     const settings = this.settings = mergeSettings(Game.SETTINGS_DEFAULT, userSettings);
     // create engine
@@ -259,7 +304,7 @@ export class Game {
       isGameOver: false,
     };
 
-
+    Events.on(this.engine, "collisionStart", this.onCollision.bind(this))
 
     this.sensorExecutor = createSensorExecutor(this);
   }

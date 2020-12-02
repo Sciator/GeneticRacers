@@ -59,7 +59,7 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
       });
 
       Events.on(render, "afterRender", () => {
-        [0,1].forEach(pi=>{
+        game.gameState.players.forEach((_p, pi) => {
           const res = game.sensor(pi);
           const playerPos = game.gameState.players[pi].body.position;
 
@@ -74,11 +74,11 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
 
       let last = Date.now();
       const step = () => {
-        const { settings: { simulation: { delta } } } = game;
+        const { settings: { simulation: { delta } }, gameState: { isGameOver } } = game;
         if (Date.now() - last < delta)
           return;
-        last += delta;
 
+        last += delta;
 
         const walk = capturedKeys.has("ArrowUp");
         const rotate = capturedKeys.has("ArrowLeft") ? -1
@@ -93,7 +93,9 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
 
       const rafLoop = () => {
         step();
-        requestAnimationFrame(rafLoop);
+        const { gameState: { isGameOver } } = game;
+        if (!isGameOver)
+          requestAnimationFrame(rafLoop);
       };
       requestAnimationFrame(rafLoop);
 
