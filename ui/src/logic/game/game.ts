@@ -75,6 +75,8 @@ export type GameState = {
   isGameOver: boolean,
 };
 
+type SensorPoint = { point: Vector, type: "none" | "unknown" | EGameStateObjectType };
+
 
 const mergeSettings = (s: GameSettings, t: Partial<GameSettings>): GameSettings =>
   ({
@@ -83,6 +85,7 @@ const mergeSettings = (s: GameSettings, t: Partial<GameSettings>): GameSettings 
     map: { ...s.map, ...t?.map },
     simulation: { ...s.simulation, ...t?.simulation },
   });
+
 
 
 export class Game {
@@ -234,10 +237,19 @@ export class Game {
 
   }
 
-  public sensor(playerIndex: number) {
+  public sensor(playerIndex: number): SensorPoint[] {
+
     const { gameState: { players }, sensorExecutor, } = this;
     const { body } = players?.[playerIndex] ?? throwReturn(`Player with index ${playerIndex} not found!`);
-    return sensorExecutor(body);
+    return sensorExecutor(body)
+      .map(({ id, point }) => ({
+        point,
+        type:
+          (id === undefined) ? "none"
+            : this.getObjFromId(id)?.type
+            || "unknown"
+        ,
+      }));
   }
 
   private onCollision(e: Matter.IEventCollision<Engine>) {

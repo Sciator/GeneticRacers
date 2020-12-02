@@ -64,8 +64,8 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
           const playerPos = game.gameState.players[pi].body.position;
 
           res.forEach(res => {
-            renderPoint(render, res);
-            renderLine(render, playerPos, res);
+            renderPoint(render, res.point);
+            renderLine(render, playerPos, res.point);
           });
         });
       });

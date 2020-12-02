@@ -1,6 +1,6 @@
 import { Engine, Vector, Composite, Bodies, Body } from "matter-js";
 import { throwReturn } from "../../core/common";
-import { raycast } from "../../core/raycast";
+import { raycast } from "../../utils/raycast";
 import { Game } from "./game";
 
 export type SensorExecutor = ReturnType<typeof createSensorExecutor>;
@@ -31,17 +31,20 @@ export const createSensorExecutor = (game: Game) => {
 
     const playerVector = Vector.create(x, y);
 
-    return sensorAngles.map(x => {
+    return sensorAngles.map((x): { point: Vector, id: number | undefined } => {
       const ray = raycast(
         bodies.filter(({ id }) => id !== body.id),
         playerVector,
         Vector.rotate(Vector.create(1, 0), x),
         rayRange
       );
-      if (!ray?.point)
-        return Vector.add(playerVector, Vector.mult(Vector.normalise(Vector.rotate(Vector.create(1, 0), x)), rayRange));
-      else
-        return ray.point;
+      return {
+        point: (!ray?.point)
+          ? Vector.add(playerVector, Vector.mult(Vector.normalise(Vector.rotate(Vector.create(1, 0), x)), rayRange))
+          : ray.point
+        ,
+        id: ray?.body.id,
+      };
     });
   };
 };
