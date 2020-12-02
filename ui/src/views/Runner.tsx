@@ -85,8 +85,9 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
           : capturedKeys.has("ArrowRight") ? 1
             : 0
           ;
+        const use = capturedKeys.has(" ");
 
-        game.next({ players: [{ walk, rotate } as any] });
+        game.next({ players: [{ walk, rotate, use } as any] });
         step();
       };
 

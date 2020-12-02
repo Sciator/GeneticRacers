@@ -38,10 +38,19 @@ export type GameInput = {
 };
 
 
-export type GameStatePlayer = {
-  /** player body id inside engine */
+export enum EGameStateObjectType {
+  player, bullet
+}
+
+export type GameStateObject = {
+  /** engine body */
   body: Body,
+  type: EGameStateObjectType,
   health: number,
+}
+
+export type GameStatePlayer = GameStateObject & {
+  type: EGameStateObjectType.player,
   ammo: number[],
   item: {
     /**
@@ -56,8 +65,14 @@ export type GameStatePlayer = {
   },
 };
 
+export type GameStateBullet = GameStateObject & {
+  type: EGameStateObjectType.bullet,
+};
+
 export type GameState = {
   players: GameStatePlayer[],
+  bullets: GameStateBullet[],
+  isGameOver: boolean,
 };
 
 
@@ -98,10 +113,15 @@ export class Game {
   };
 
   public next(userInput?: Partial<GameInput>) {
-    const { engine, settings: { simulation: { delta } } } = this;
+    const { engine, settings: { simulation: { delta } }, gameState: { players } } = this;
     this.applyInput(userInput);
 
     Engine.update(engine, delta);
+
+    players.forEach(({ item }) => item.cooldown = Math.max(item.cooldown - delta, 0));
+
+    this.removeDead();
+    this.processBullets();
   }
 
   /** applies changes to object based on user input */
@@ -118,7 +138,8 @@ export class Game {
     const { players: playersInputs } = mergeInput();
 
     playersInputs.forEach((x, i) => {
-      const { body } = players[i];
+      const player = players[i];
+      const { body } = player;
       if (x.walk) {
         let vec = Vector.rotate(Vector.create(1, 0), body.angle);
         vec = Vector.mult(vec, 5);
@@ -127,9 +148,71 @@ export class Game {
       if (x.rotate !== 0) {
         Body.setAngularVelocity(body, x.rotate * .3);
       }
+      if (x.use) {
+        this.use(player);
+      }
     });
   }
 
+  private removeDead() {
+    const { world, gameState } = this;
+
+    const deadBullets = gameState.bullets.filter(({ health }) => health <= 0);
+    gameState.bullets = gameState.bullets.filter(({ health }) => health > 0);
+
+    deadBullets.forEach((x) => {
+      World.remove(world, x.body);
+      console.log("dead");
+    });
+  };
+
+  private processBullets() {
+    const { gameState: { bullets } } = this;
+    // todo: based on delta
+    bullets.forEach(x => { x.health -= .01 });
+
+    bullets.map(x => {
+      const { body, health } = x;
+      const { speed, velocity } = body;
+
+      const targetSpeed = health * 10;
+      const speedMult = targetSpeed / speed;
+
+      Body.setVelocity(body, Vector.mult(velocity, speedMult));
+    });
+  }
+
+  private use(player: GameStatePlayer) {
+    const bulletSize = 5;
+    const itemCooldown = 2000;
+
+    // todo: check ammo 
+    const { body: { position, angle }, item } = player;
+    const { gameState: { bullets }, settings: { game: { playerSize } } } = this;
+
+    if (item.cooldown !== 0)
+      return;
+    item.cooldown = itemCooldown;
+
+    const distance = playerSize + bulletSize + 1;
+
+    const one = Vector.create(1, 0);
+    const angled = Vector.rotate(one, angle);
+    const bulletStartPosition = Vector.add(Vector.mult(angled, distance), position);
+
+    const { x, y } = bulletStartPosition;
+    const body = Bodies.circle(x, y, bulletSize, { angle, restitution: 1 });
+
+    World.add(this.world, body);
+    Body.setVelocity(body, Vector.mult(angled, 10));
+
+    bullets.push({
+      type: EGameStateObjectType.bullet,
+      health: 1,
+      body,
+    })
+
+  }
 
   public sensor(playerIndex: number) {
     const { gameState: { players }, sensorExecutor, } = this;
@@ -167,10 +250,13 @@ export class Game {
     this.gameState = {
       players: players.map((body) =>
         ({
+          type: EGameStateObjectType.player,
           body,
           ammo: [], health: 1,
           item: { cooldown: 0, selected: 0 },
         } as GameStatePlayer)),
+      bullets: [],
+      isGameOver: false,
     };
 
 
