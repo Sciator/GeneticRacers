@@ -45,10 +45,10 @@ export const Settings: React.FC<TSettingsProps> = () => {
               <Input value="5" disabled={true} type="number" addonAfter="Input"></Input>
             </Col>
             <Col xxl={24}>
-                <Input.Group compact>
-                  <Input value="10" style={{width:"calc(100% - 50px)"}}></Input>
-                  <Button type="dashed" style={{width:"50px"}}><CloseOutlined translate /></Button>
-                </Input.Group>
+              <Input.Group compact>
+                <Input value="10" style={{ width: "calc(100% - 50px)" }}></Input>
+                <Button type="dashed" style={{ width: "50px" }}><CloseOutlined translate /></Button>
+              </Input.Group>
             </Col>
             <Col xxl={24}>
               <Button
