@@ -1,7 +1,7 @@
 import { randInt, range, shuffle } from "../../core/common";
 import { IAProcessGenerationFunction, IASelectionFunctionType } from "../ai/ga/gaProcesGenerationFunction";
 import { GeneticAlgorithmNeuralNet } from "../ai/gann/gann";
-import { NeuralNet } from "../ai/nn/nn";
+import { IANNInitParams, NeuralNet } from "../ai/nn/nn";
 import { IANNActivationFunction } from "../ai/nn/nnActivationFunctions";
 import { Game } from "../game/game";
 import { GameAiEval } from "./GameAiEval";
@@ -59,6 +59,8 @@ export class GameAI {
       sensors: [Math.PI * 1 / 4, Math.PI * 1 / 8, Math.PI * 1 / 32],
     },
   }
+
+
 
   private createEnvironmentBatch() {
     return (dnas: DNA[]) => {

@@ -1,9 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import { Card } from "antd";
-import { Events, Render, Vector } from "matter-js";
 import { Game } from "../logic/game/game";
 import { capturedKeys, keyCaptureStart, keyCaptureStop } from "../core/keycapture";
-import { renderLine, renderPoint } from "../utils/rendererUtils";
+import { gameRender } from "../logic/game/render";
+import { GameAiEval } from "../logic/gameAi/GameAiEval";
+import { range } from "../core/common";
+import { GameAI } from "../logic/gameAi/GameAi";
+
+const debug = false;
 
 type TRunnerProps = {
   capture?: boolean,
@@ -16,90 +20,41 @@ type TRendererProps = {
 
 const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
   const ref = useRef<HTMLDivElement>(undefined as any);
-  const debug = false;
 
   const init = () => {
-    (async () => {
-      if (!ref.current)
-        return;
+    setTimeout(() => {
+      _init();
+    }, (2000));
+  }
 
-      const game = new Game();
+  const _init = () => {
+    if (!ref.current)
+      return;
+    // const game = new Game();
+    const element = ref.current;
 
-      const engine = game.engine;
+    const botsNNs = range(2).map(() => GameAiEval.initializeRandomBot(
+      { hiddens: [8, 5, 3], sensorSidesArrayAngleLength: GameAI.defaultInitParams.aiParams.sensors.length }
+    ))
+    const gameAi = new GameAiEval(botsNNs);
 
-      // create renderer
-      const render = Render.create({
-        element: ref.current,
-        engine,
-        options: {
-          width,
-          height,
+    const aiInput = () => gameAi.calculateBotResponse();
 
-          background: "#ffffff",
-          wireframeBackground: "#0f0f13",
-          wireframes: false,
+    const userInput = () => {
+      const walk = capturedKeys.has("ArrowUp");
+      const rotate = capturedKeys.has("ArrowLeft") ? -1
+        : capturedKeys.has("ArrowRight") ? 1
+          : 0
+        ;
+      const use = capturedKeys.has(" ");
+      return { players: [undefined, { walk, rotate, use } as any] };
+    };
 
-          ...(debug
-            ? {
-              wireframes: true,
-              showVelocity: true,
-              showCollisions: true,
-              showSeparations: true,
-              showAngleIndicator: true,
-            } : {}),
-        } as any,
-      });
+    keyCaptureStart();
 
-      Render.run(render);
-
-      // fit the render viewport to the scene
-      (Render as any).lookAt(render, {
-        min: { x: 0, y: 0 },
-        max: { x: game.settings.map.size, y: game.settings.map.size },
-      });
-
-      Events.on(render, "afterRender", () => {
-        game.gameState.players.forEach((_p, pi) => {
-          const res = game.sensor(pi);
-          const playerPos = game.gameState.players[pi].body.position;
-
-          res.forEach(res => {
-            renderPoint(render, res.point);
-            renderLine(render, playerPos, res.point);
-          });
-        });
-      });
-
-      keyCaptureStart();
-
-      let last = Date.now();
-      const step = () => {
-        const now = Date.now();
-        const delta = now - last;
-        last = now;
-
-        const walk = capturedKeys.has("ArrowUp");
-        const rotate = capturedKeys.has("ArrowLeft") ? -1
-          : capturedKeys.has("ArrowRight") ? 1
-            : 0
-          ;
-        const use = capturedKeys.has(" ");
-
-        game.next({ players: [undefined, { walk, rotate, use } as any] }, delta);
-      };
-
-      const rafLoop = () => {
-        step();
-        if (!game.isGameOver) {
-          requestAnimationFrame(rafLoop);
-        } else {
-          // todo: print winner on canvas
-          console.log(`winner is ${game.gameState.winner}`);
-        }
-      };
-      requestAnimationFrame(rafLoop);
-
-    })();
+    gameRender({
+      element, game: gameAi.game, height, width, debug, input: aiInput,
+    });
   };
   useEffect(init, []);
 
