@@ -28,3 +28,29 @@ export const splitToChunks = <T>(arr: T[], chunkSize: number): T[][] => range(Ma
 export const throwReturn = <T>(message: string): T => {
   throw new Error(message);
 };
+
+/** Shuffle given array */
+export const shuffle = <T>(arr: T[]) => {
+  const swap = (i: number, j: number) => {
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    swap(i, j);
+  }
+};
+
+export const randInt: {
+  /** generates ranodm integer number */
+  (maxExcluded: number): number;
+  /** generates ranodm integer number */
+  (minIncluded: number, maxExcluded: number): number;
+} = (a: number, b?: number): number => {
+  if (b === undefined) {
+    return Math.floor(Math.random() * a);
+  }
+  else {
+    return Math.floor(Math.random() * (b - a)) + a;
+  }
+};

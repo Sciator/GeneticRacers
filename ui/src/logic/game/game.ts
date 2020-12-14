@@ -1,5 +1,6 @@
 import { Engine, World, Bodies, Vector, Composite, Body, Events } from "matter-js";
 import { throwReturn } from "../../core/common";
+import { GameAI } from "../gameAi/GameAi";
 import { createSensorExecutor, SensorExecutor } from "./sensors";
 
 const frictionAir = .3;
@@ -72,27 +73,30 @@ export type GameStateBullet = GameStateObject & {
 export type GameState = {
   players: GameStatePlayer[],
   bullets: GameStateBullet[],
-  isGameOver: boolean,
+  /** index of game winner, if -1 game isn't over yet */
+  winner: number,
 };
 
-type SensorPoint = { point: Vector, type: "none" | "unknown" | EGameStateObjectType };
+export type SensorPoint = { point: Vector, type: "none" | "unknown" | EGameStateObjectType };
 
 
 const mergeSettings = (s: GameSettings, t: Partial<GameSettings>): GameSettings =>
-  ({
-    ai: { ...s.ai, ...t?.ai },
-    game: { ...s.game, ...t?.game },
-    map: { ...s.map, ...t?.map },
-    simulation: { ...s.simulation, ...t?.simulation },
-  });
+({
+  ai: { ...s.ai, ...t?.ai },
+  game: { ...s.game, ...t?.game },
+  map: { ...s.map, ...t?.map },
+  simulation: { ...s.simulation, ...t?.simulation },
+});
 
 
 
 export class Game {
   public engine: Engine;
-  public get world(): World { return this.engine.world; }
   public settings: GameSettings;
   public gameState: GameState;
+
+  public get world(): World { return this.engine.world; }
+  public get isGameOver(): boolean { return this.gameState.winner !== -1; }
 
   public sensorExecutor: SensorExecutor;
 
@@ -106,8 +110,9 @@ export class Game {
 
 
   public static readonly SETTINGS_DEFAULT: Readonly<GameSettings> = {
+    // todo: move to game AI with sensors logic
     ai: {
-      sensorSidesArrayAngle: [Math.PI * 1 / 4, Math.PI * 1 / 8, Math.PI * 1 / 32],
+      sensorSidesArrayAngle: GameAI.defaultInitParams.aiParams.sensors,
       sensorMaxRange: 200,
     },
     map: {
@@ -122,13 +127,16 @@ export class Game {
     },
   };
 
-  public next(userInput?: Partial<GameInput>) {
-    const { engine, settings: { simulation: { delta } }, gameState: { players, isGameOver } } = this;
+  // todo: check if player is not dead
+  public next(userInput?: Partial<GameInput>, deltaOveride?: number) {
+    const { engine, settings: { simulation: { delta: deltaSettings } }, gameState: { players }, isGameOver } = this;
     if (isGameOver) {
       console.warn("next called when game is over");
       return;
     }
     this.applyInput(userInput);
+
+    const delta = deltaOveride || deltaSettings;
 
     Engine.update(engine, delta);
 
@@ -179,19 +187,22 @@ export class Game {
       console.log("dead");
     });
 
-    const deadPlayers = gameState.players.filter(({ health }) => health <= 0);
-    gameState.players = gameState.players.filter(({ health }) => health > 0);
+    const deadPlayers = gameState.players.map((p, i) => ({ p, i })).filter(({ p: { health } }) => health <= 0);
+    const alivePlayers = gameState.players.map((p, i) => ({ p, i })).filter(({ p: { health } }) => health > 0);
 
     deadPlayers.forEach((x) => {
-      World.remove(world, x.body);
+      World.remove(world, x.p.body);
       console.log("dead");
-      this.gameState.isGameOver = true;
     });
+
+    if (alivePlayers.length === 1) {
+      this.gameState.winner = alivePlayers[0].i;
+    }
   };
 
   private processBullets() {
     const { gameState: { bullets } } = this;
-    // todo: based on delta
+    // todo: based on current step delta
     bullets.forEach(x => { x.health -= .01 });
 
     bullets.map(x => {
@@ -237,8 +248,8 @@ export class Game {
 
   }
 
+  // todo: move all sensor related things into GameAI folder
   public sensor(playerIndex: number): SensorPoint[] {
-
     const { gameState: { players }, sensorExecutor, } = this;
     const { body } = players?.[playerIndex] ?? throwReturn(`Player with index ${playerIndex} not found!`);
     return sensorExecutor(body)
@@ -279,8 +290,9 @@ export class Game {
 
   constructor(userSettings: Partial<GameSettings> = {}) {
     const settings = this.settings = mergeSettings(Game.SETTINGS_DEFAULT, userSettings);
-    // create engine
-    this.engine = Engine.create();
+    // create engine (as any for ignoring deprecated warning 
+    //    - no other function to create engine known)
+    this.engine = (Engine as any).create();
     const world = this.world;
 
     world.gravity.y = 0;
@@ -306,14 +318,15 @@ export class Game {
 
     this.gameState = {
       players: players.map((body) =>
-        ({
-          type: EGameStateObjectType.player,
-          body,
-          ammo: [], health: 1,
-          item: { cooldown: 0, selected: 0 },
-        } as GameStatePlayer)),
+      ({
+        type: EGameStateObjectType.player,
+        body,
+        ammo: [], health: 1,
+        item: { cooldown: 0, selected: 0 },
+      })
+      ),
       bullets: [],
-      isGameOver: false,
+      winner: -1,
     };
 
     Events.on(this.engine, "collisionStart", this.onCollision.bind(this))

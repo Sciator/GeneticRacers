@@ -1,22 +1,26 @@
 import { Card, Row, Col } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { Analyze } from "./Analyze";
 import { PlayPage } from "./Play";
-import { Settings } from "./Settings";
+import { Settings, TSettingState } from "./Settings";
 import { History } from "./History";
 import { RunAI } from "./RunAI";
+import { GameAI } from "../logic/gameAi/GameAi";
+
+const {defaultInitParams} = GameAI;
 
 type TMainPageProps = {
 
 };
 
 export const MainPage: React.FC<TMainPageProps> = () => {
+  const [aiSettings, setAiSettings] = useState<TSettingState>(defaultInitParams);
 
   return <>
     <Card>
       <Row gutter={[8, 0]}>
         <Col xxl={8}>
-          <Settings />
+          <Settings {...{aiSettings, setAiSettings}} />
         </Col>
         <Col xxl={8}>
           <Row gutter={[0, 8]}>

@@ -4,17 +4,16 @@ import { IAProcessGenerationFunction, IBreedFunction } from "./gaProcesGeneratio
 
 /** function for create initial population */
 export type IDNAInit<DNA> = () => DNA;
-/** simulation environment returns fitness */
-export type IEnvironment<DNA> = (dna: DNA) => number;
-
 export type IGAInitArgs = {
   /** size of population */
   popSize: number,
 };
 
 export type EnvironmentFunctions<DNA> = ({
-  _environment: IEnvironment<DNA>,
+  /** simulation environment returns fitness */
+  _environment: (dna: DNA) => number;
 } | {
+  /** simulation environment returns fitness for whole population at once */
   _environmentBatch: (dna: DNA[]) => number[],
 });
 
@@ -36,8 +35,6 @@ type IGAPopulation<DNA> = readonly {
   readonly fitness: number,
   readonly dna: DNA,
 }[];
-
-
 
 export class GeneticAlgorithm<DNA> {
   /** non-serializable GA functions */
@@ -96,7 +93,7 @@ export class GeneticAlgorithm<DNA> {
 
   /** creates sorted copy of DNA array */
   private static sortMostFitFirst<DNA>(pop: IGAPopulation<DNA>) {
-    const cpy = [...pop,]; cpy.sort(({ fitness: a, }, { fitness: b, }) => -(a - b)); return cpy;
+    return [...pop,].sort(({ fitness: a, }, { fitness: b, }) => -(a - b));
   }
 
   private constructor(fncs: IGAFunctions<DNA>, pop: IGAPopulation<DNA>

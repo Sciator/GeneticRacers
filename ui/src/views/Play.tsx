@@ -2,11 +2,11 @@ import React, { useEffect, useRef } from "react";
 import { Card } from "antd";
 import { Events, Render, Vector } from "matter-js";
 import { Game } from "../logic/game/game";
-import { capturedKeys, keyCaptureStart } from "../core/keycapture";
+import { capturedKeys, keyCaptureStart, keyCaptureStop } from "../core/keycapture";
 import { renderLine, renderPoint } from "../utils/rendererUtils";
 
 type TRunnerProps = {
-
+  capture?: boolean,
 };
 
 type TRendererProps = {
@@ -74,11 +74,9 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
 
       let last = Date.now();
       const step = () => {
-        const { settings: { simulation: { delta } }, gameState: { isGameOver } } = game;
-        if (Date.now() - last < delta)
-          return;
-
-        last += delta;
+        const now = Date.now();
+        const delta = now - last;
+        last = now;
 
         const walk = capturedKeys.has("ArrowUp");
         const rotate = capturedKeys.has("ArrowLeft") ? -1
@@ -87,15 +85,17 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
           ;
         const use = capturedKeys.has(" ");
 
-        game.next({ players: [{ walk, rotate, use } as any] });
-        step();
+        game.next({ players: [undefined, { walk, rotate, use } as any] }, delta);
       };
 
       const rafLoop = () => {
         step();
-        const { gameState: { isGameOver } } = game;
-        if (!isGameOver)
+        if (!game.isGameOver) {
           requestAnimationFrame(rafLoop);
+        } else {
+          // todo: print winner on canvas
+          console.log(`winner is ${game.gameState.winner}`);
+        }
       };
       requestAnimationFrame(rafLoop);
 
@@ -110,7 +110,11 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
   </>;
 };
 
-export const PlayPage: React.FC<TRunnerProps> = () => {
+export const PlayPage: React.FC<TRunnerProps> = ({ capture }) => {
+  if (capture)
+    keyCaptureStart();
+  else
+    keyCaptureStop();
 
   return <>
     <Card title="Play">

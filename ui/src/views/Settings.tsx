@@ -1,12 +1,24 @@
-import React from "react";
-import { Button, Card, Col, Form, Input, Row } from "antd";
+import React, { Dispatch, FC, SetStateAction } from "react";
+import { Button, Card, Col, Form, Input, Row, Select } from "antd";
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
+import { IGeneticAlgorithmNeuralNetInit } from "../logic/ai/gann/gann";
+import { produce } from "immer";
+import { GameAI, GameAIInitParams } from "../logic/gameAi/GameAi";
+import { IASelectionFunctionType } from "../logic/ai/ga/gaProcesGenerationFunction";
+
+export type TSettingState = GameAIInitParams
 
 type TSettingsProps = {
-
+  aiSettings: TSettingState,
+  setAiSettings: Dispatch<SetStateAction<TSettingState>>,
 };
 
-export const Settings: React.FC<TSettingsProps> = () => {
+export const Settings: FC<TSettingsProps> = (props) => {
+  const { aiSettings, setAiSettings } = props;
+  const {
+    gaInit: { popSize },
+    nnInit: { }
+  } = aiSettings;
 
   return <>
     <Card title="Settings" style={{ overflowY: "auto", height: "100%" }}>
@@ -14,11 +26,15 @@ export const Settings: React.FC<TSettingsProps> = () => {
         <Form.Item label={<div />} style={{ userSelect: "none" }}>
           Genetic algorithm:
         </Form.Item>
-        <Form.Item label="Generations">
-          <Input></Input>
+        <Form.Item label="Max generations">
+          <Input
+          ></Input>
         </Form.Item>
         <Form.Item label="Population size">
-          <Input></Input>
+          <Input
+            value={popSize}
+            onChange={e => setAiSettings(produce(aiSettings, x => { x.gaInit.popSize = +e.target.value }))}
+          ></Input>
         </Form.Item>
         <Form.Item label="Parents">
           <Input></Input>
@@ -27,12 +43,11 @@ export const Settings: React.FC<TSettingsProps> = () => {
           <Input></Input>
         </Form.Item>
         <Form.Item label="Selection type">
-          <Input></Input>
+          <Select>
+
+          </Select>
         </Form.Item>
         <Form.Item label="Selection param">
-          <Input></Input>
-        </Form.Item>
-        <Form.Item label="Population size">
           <Input></Input>
         </Form.Item>
 
