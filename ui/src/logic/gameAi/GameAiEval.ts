@@ -1,12 +1,11 @@
 import { Vector } from "matter-js";
-import { flatReducer } from "../../core/common";
 import { IANNInitParams, NeuralNet } from "../ai/nn/nn";
-import { EGameStateObjectType, Game, GameInput, GameInputPlayer, SensorPoint } from "../game/game";
+import { EGameStateObjectType, Game, GameInputPlayer, GameSettings, SensorPoint } from "../game/game";
 
 
 export type InitializeRandomBotParams = {
   /** length of gameAI's sensorSidesArrayAngle */
-  sensorSidesArrayAngleLength: number,
+  sensors: number[] | { length: number },
   /** hiden layers number of neurons */
   hiddens: number[],
   /** activation functions */
@@ -47,10 +46,17 @@ export class GameAiEval {
     return this.game.isGameOver;
   }
 
+  /** number of nn outputs that is needed to convert into game input */
+  public static NN_OUTPUTS = 4;
+  /** returns number of nn inputs for given sensors array */
+  public static NN_INPUTS_GET({ sensors }: { sensors: number[] | { length: number } }) {
+    return (sensors.length * 2 + 1) * 2;
+  }
+
   public static initializeRandomBot(params: InitializeRandomBotParams): NeuralNet {
-    const { hiddens, afunction, sensorSidesArrayAngleLength } = params;
+    const { hiddens, afunction, sensors } = params;
     const outputs = GameAiEval.NN_OUTPUTS;
-    const inputs = (sensorSidesArrayAngleLength * 2 + 1) * 2;
+    const inputs = GameAiEval.NN_INPUTS_GET({ sensors });
     return NeuralNet.create({
       layerScheme: { hiddens, inputs, outputs }, afunction
     });
@@ -68,8 +74,6 @@ export class GameAiEval {
       ;
   }
 
-  /** number of nn outputs that is needed to convert into game input */
-  private static NN_OUTPUTS = 4;
   /** conver output of neural net into game input */
   private inputFromNN(numbers: number[]): GameInputPlayer {
     return {
@@ -88,7 +92,7 @@ export class GameAiEval {
   }
 
   /** return's bots repsonses for current game state (used inside next) */
-  public calculateBotResponse(){
+  public calculateBotResponse() {
     const { game } = this;
     const { gameState: { players } } = this.game;
     const sensorsResults = players.map((_, i) => this.sensorAsNumbers(i, game.sensor(i)));
@@ -110,9 +114,9 @@ export class GameAiEval {
     this.game.next(calculated);
   }
 
-  constructor(playerNNs: NeuralNet[]) {
+  constructor(playerNNs: NeuralNet[], gameSettings: GameSettings) {
     this.playerNNs = playerNNs;
-    this.game = new Game();
+    this.game = new Game(gameSettings);
   }
 }
 

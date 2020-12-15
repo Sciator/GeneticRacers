@@ -14,6 +14,7 @@ export type GameSettings = {
   },
   game: {
     playerSize: number,
+    maxGameLength: number,
   },
   map: {
     size: number,
@@ -73,8 +74,9 @@ export type GameStateBullet = GameStateObject & {
 export type GameState = {
   players: GameStatePlayer[],
   bullets: GameStateBullet[],
-  /** index of game winner, if -1 game isn't over yet */
+  /** index of game winner, if -1 game isn't over yet -2 if game is draw */
   winner: number,
+  timeRemaining: number,
 };
 
 export type SensorPoint = { point: Vector, type: "none" | "unknown" | EGameStateObjectType };
@@ -112,8 +114,8 @@ export class Game {
   public static readonly SETTINGS_DEFAULT: Readonly<GameSettings> = {
     // todo: move to game AI with sensors logic
     ai: {
-      sensorSidesArrayAngle: GameAI.defaultInitParams.aiParams.sensors,
-      sensorMaxRange: 200,
+      sensorSidesArrayAngle: (GameAI.defaultInitParams.aiParams as any).sensors,
+      sensorMaxRange: 500,
     },
     map: {
       size: 300,
@@ -121,6 +123,7 @@ export class Game {
     },
     game: {
       playerSize: 10,
+      maxGameLength: 10_000,
     },
     simulation: {
       delta: 32,
@@ -137,6 +140,11 @@ export class Game {
     this.applyInput(userInput);
 
     const delta = deltaOveride || deltaSettings;
+    this.gameState.timeRemaining -= delta;
+
+    if (this.gameState.timeRemaining <= 0) {
+      players.forEach(x => x.health = 0);
+    }
 
     Engine.update(engine, delta);
 
@@ -166,9 +174,11 @@ export class Game {
         let vec = Vector.rotate(Vector.create(1, 0), body.angle);
         vec = Vector.mult(vec, 5);
         Body.setVelocity(body, vec);
+        player.health -= .0005
       }
       if (x.rotate !== 0) {
         Body.setAngularVelocity(body, x.rotate * .3);
+        player.health -= Math.abs(x.rotate) * .005
       }
       if (x.use) {
         this.use(player);
@@ -184,7 +194,6 @@ export class Game {
 
     deadBullets.forEach((x) => {
       World.remove(world, x.body);
-      console.log("dead");
     });
 
     const deadPlayers = gameState.players.map((p, i) => ({ p, i })).filter(({ p: { health } }) => health <= 0);
@@ -192,11 +201,12 @@ export class Game {
 
     deadPlayers.forEach((x) => {
       World.remove(world, x.p.body);
-      console.log("dead");
     });
 
     if (alivePlayers.length === 1) {
       this.gameState.winner = alivePlayers[0].i;
+    } else if (alivePlayers.length === 0) {
+      this.gameState.winner = -2;
     }
   };
 
@@ -246,6 +256,7 @@ export class Game {
       body,
     })
 
+    player.health -= .1;
   }
 
   // todo: move all sensor related things into GameAI folder
@@ -327,6 +338,7 @@ export class Game {
       ),
       bullets: [],
       winner: -1,
+      timeRemaining: settings.game.maxGameLength,
     };
 
     Events.on(this.engine, "collisionStart", this.onCollision.bind(this))

@@ -1,15 +1,13 @@
 import { randInt, range, shuffle } from "../../core/common";
 import { IAProcessGenerationFunction, IASelectionFunctionType } from "../ai/ga/gaProcesGenerationFunction";
 import { GeneticAlgorithmNeuralNet } from "../ai/gann/gann";
-import { IANNInitParams, NeuralNet } from "../ai/nn/nn";
+import { NeuralNet } from "../ai/nn/nn";
 import { IANNActivationFunction } from "../ai/nn/nnActivationFunctions";
-import { Game } from "../game/game";
+import { Game, GameSettings } from "../game/game";
 import { GameAiEval } from "./GameAiEval";
 
 
 type DNA = NeuralNet;
-
-export const GAME_INPUTS_AI = 3;
 
 export type GameAIInitParams = {
   nnInit: {
@@ -23,8 +21,8 @@ export type GameAIInitParams = {
     popSize: number,
     proccessFunction: IAProcessGenerationFunction,
   },
-  gameParams: {
-  },
+  games: number,
+  gameSettings: GameSettings,
   aiParams: {
     /** sensor angles from center to both side (in radians) */
     sensors: number[]
@@ -36,9 +34,11 @@ export type GameAIInitParams = {
  */
 export class GameAI {
   public gann: GeneticAlgorithmNeuralNet;
+  public proccessFunction: IAProcessGenerationFunction;
+  public games: number;
+  public gameSettings: GameSettings;
 
-
-  public static readonly defaultInitParams: Readonly<GameAIInitParams> = {
+  public static readonly defaultInitParams: Partial<GameAIInitParams> = {
     gaInit: {
       popSize: 100,
       proccessFunction: {
@@ -46,25 +46,25 @@ export class GameAI {
         mutationRate: .01,
         selection: {
           type: IASelectionFunctionType.percent,
-          value: .2,
+          value: 10,
         }
       }
     },
     nnInit: {
       hiddenLayers: [8, 8, 8],
     },
-    gameParams: {
-    },
+    games: 10,
     aiParams: {
       sensors: [Math.PI * 1 / 4, Math.PI * 1 / 8, Math.PI * 1 / 32],
     },
   }
 
+  private onGameEnd: (() => void) | undefined = undefined;
 
 
   private createEnvironmentBatch() {
     return (dnas: DNA[]) => {
-      const numOfGames = 4;
+      const numOfGames = this.games;
       const dnasWithRes: { dna: DNA, games: number, wins: number }[] =
         dnas.map(dna => ({ dna, games: 0, wins: 0 }));
 
@@ -84,10 +84,16 @@ export class GameAI {
         ];
         players.forEach(p => { p.games++; });
 
-        const evaler = new GameAiEval(players.map(x => x.dna));
+        const evaler = new GameAiEval(players.map(x => x.dna), this.gameSettings);
         evaler.run();
         const winner = evaler.game.gameState.winner;
-        players[winner].wins++;
+        if (winner >= 0) {
+          players.forEach(x => x.wins--)
+          players[winner].wins += 20;
+        } else {
+          players.forEach(x => x.wins -= 0.5);
+        }
+        this?.onGameEnd?.();
       }
 
       return dnasWithRes.map(x => x.wins);
@@ -95,24 +101,35 @@ export class GameAI {
   }
 
   /** calculate next generation */
-  public next() {
+  public next(onGameEnd?: () => void) {
+    this.onGameEnd = onGameEnd;
+    this.gann = this.gann.calculateNextGen(this.proccessFunction);
+    this.onGameEnd = undefined;
   }
 
-  constructor(ai: GameAIInitParams) {
-    const sensorsNum = 1 + 2 * ai.aiParams.sensors.length;
+  constructor(ai: GameAIInitParams, onGameEnd?: () => void) {
+    const sensors = ai.aiParams.sensors;
+    const inputs = GameAiEval.NN_INPUTS_GET({ sensors });
+    const outputs = GameAiEval.NN_OUTPUTS;
     const _environmentBatch = this.createEnvironmentBatch();
 
+    this.proccessFunction = ai.gaInit.proccessFunction;
+    this.games = ai.games;
+    this.gameSettings = ai.gameSettings;
+
+    this.onGameEnd = onGameEnd;
     this.gann = GeneticAlgorithmNeuralNet.create({
       gaInit: ai.gaInit,
       nnInit: {
         layerScheme: {
-          inputs: sensorsNum,
+          inputs,
           hiddens: ai.nnInit.hiddenLayers,
-          outputs: GAME_INPUTS_AI,
+          outputs,
         }
       },
       _environment: { _environmentBatch },
     });
+    this.onGameEnd = undefined;
   }
 }
 

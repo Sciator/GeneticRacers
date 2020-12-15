@@ -14,7 +14,7 @@ type TMainPageProps = {
 };
 
 export const MainPage: React.FC<TMainPageProps> = () => {
-  const [aiSettings, setAiSettings] = useState<TSettingState>(defaultInitParams);
+  const [aiSettings, setAiSettings] = useState<TSettingState>(defaultInitParams as any);
 
   return <>
     <Card>

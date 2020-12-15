@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { Card } from "antd";
 import { Game } from "../logic/game/game";
-import { capturedKeys, keyCaptureStart, keyCaptureStop } from "../core/keycapture";
+import { keyCaptureStart, keyCaptureStop } from "../core/keycapture";
 import { gameRender } from "../logic/game/render";
 import { GameAiEval } from "../logic/gameAi/GameAiEval";
 import { range } from "../core/common";
 import { GameAI } from "../logic/gameAi/GameAi";
+import { IASelectionFunctionType } from "../logic/ai/ga/gaProcesGenerationFunction";
 
 const debug = false;
 
@@ -27,33 +28,65 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
     }, (2000));
   }
 
-  const _init = () => {
+  const _init = async () => {
     if (!ref.current)
       return;
     // const game = new Game();
     const element = ref.current;
 
-    const botsNNs = range(2).map(() => GameAiEval.initializeRandomBot(
-      { hiddens: [8, 5, 3], sensorSidesArrayAngleLength: GameAI.defaultInitParams.aiParams.sensors.length }
-    ))
-    const gameAi = new GameAiEval(botsNNs);
+    const gameAi = new GameAI({
+      aiParams: {
+        sensors: Game.SETTINGS_DEFAULT.ai.sensorSidesArrayAngle,
+      },
+      gaInit: {
+        popSize: 20,
+        proccessFunction: {
+          breedingParents: 1,
+          mutationRate: .01,
+          selection: {
+            type: IASelectionFunctionType.percent,
+            value: 5,
+          }
+        }
+      },
+      games: 4,
+      gameSettings: Game.SETTINGS_DEFAULT,
+      nnInit: { hiddenLayers: [20, 10], },
+    }, () => {
+      console.log("game ended");
+    });
 
-    const aiInput = () => gameAi.calculateBotResponse();
+    range(20).forEach(x => {
+      console.log(`generation ${x} best: ${gameAi.gann.ga.population[0].fitness}`);
+      gameAi.next(() => {
+        console.log("game ended");
+      });
+    })
 
-    const userInput = () => {
-      const walk = capturedKeys.has("ArrowUp");
-      const rotate = capturedKeys.has("ArrowLeft") ? -1
-        : capturedKeys.has("ArrowRight") ? 1
-          : 0
-        ;
-      const use = capturedKeys.has(" ");
-      return { players: [undefined, { walk, rotate, use } as any] };
-    };
+    // const botsNNs = range(2).map(() => GameAiEval.initializeRandomBot(
+    //   { hiddens: [8, 5, 3], sensors: GameAI.defaultInitParams.aiParams.sensors }
+    // ))
 
-    keyCaptureStart();
+    const pop = gameAi.gann.ga.population;
+    const botsNNs = [pop[0].dna, pop[1].dna];
+
+    const gameAiEval = new GameAiEval(botsNNs, Game.SETTINGS_DEFAULT);
+
+    const aiInput = () => gameAiEval.calculateBotResponse();
+
+    // keyCaptureStart();
+    // const userInput = () => {
+    //   const walk = capturedKeys.has("ArrowUp");
+    //   const rotate = capturedKeys.has("ArrowLeft") ? -1
+    //     : capturedKeys.has("ArrowRight") ? 1
+    //       : 0
+    //     ;
+    //   const use = capturedKeys.has(" ");
+    //   return { players: [{ walk, rotate, use } as any] };
+    // };
 
     gameRender({
-      element, game: gameAi.game, height, width, debug, input: aiInput,
+      element, game: gameAiEval.game, height, width, debug, input: aiInput,
     });
   };
   useEffect(init, []);

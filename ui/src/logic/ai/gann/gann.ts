@@ -16,10 +16,6 @@ export type IGeneticAlgorithmNeuralNetInit =
 export class GeneticAlgorithmNeuralNet {
   public readonly ga: GeneticAlgorithm<NeuralNet>;
 
-  public evalByBest(inputs: number[]){
-    return this.ga.population[0].dna.predict(inputs);
-  }
-
   public calculateNextGen(evalFunctions: IAProcessGenerationFunction): GeneticAlgorithmNeuralNet {
     return new GeneticAlgorithmNeuralNet(this.ga.calculateNextGen(evalFunctions));
   }
