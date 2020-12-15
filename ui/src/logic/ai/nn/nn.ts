@@ -1,6 +1,5 @@
 import { IANNActivationFunction, IANNActivationFunctionType, createExecutableFnc } from "./nnActivationFunctions";
 import * as math from "mathjs";
-import { random } from "mathjs";
 import { range } from "../../../core/common";
 
 /** layer scheme for creating new nn */
@@ -32,7 +31,8 @@ export type IANNData = {
 
 // in -> *weights -> +bias -> hidd-fnc -> ... -> output
 
-const randomWeight = () => random(-1, 1);
+const { random } = Math;
+const randomWeight = () => random() * 2 - 1;
 
 const randomBoolean = (trueChance: number) => Math.random() < trueChance;
 

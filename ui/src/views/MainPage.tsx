@@ -23,16 +23,16 @@ export const MainPage: React.FC<TMainPageProps> = () => {
           <Settings {...{aiSettings, setAiSettings}} />
         </Col> */}
         {/* <Col xxl={8}> */}
-        <Col sm={8}>
-          <Row gutter={[0, 8]}>
-            <Col sm={24}>
+        {/* <Col sm={8}> */}
+          <Row gutter={[8, 8]}>
+            <Col sm={8}>
               <RunAI />
             </Col>
-            <Col sm={24}>
+            <Col sm={16}>
               <PlayPage />
             </Col>
           </Row>
-        </Col>
+        {/* </Col> */}
         {/* </Col> */}
         {/* <Col xxl={8}>
           <Row gutter={[0, 8]} >

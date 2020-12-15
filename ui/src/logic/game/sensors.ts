@@ -1,5 +1,4 @@
 import { Engine, Vector, Composite, Bodies, Body } from "matter-js";
-import { throwReturn } from "../../core/common";
 import { raycast } from "../../utils/raycast";
 import { Game } from "./game";
 

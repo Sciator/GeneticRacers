@@ -66,12 +66,14 @@ export class GameAiEval {
     const { gameState: { players } } = this.game;
     const { body: { position } } = players[playerIndex];
 
-    return points
-      .map(({ point, type }) => {
-        return [dist(point, position), numFromType(type)];
-      })
-      .flat()
-      ;
+    const numbers: number[] = [];
+
+    for (let i = points.length; i--;) {
+      const { point, type } = points[i];
+      numbers.push(dist(point, position), numFromType(type));
+    }
+
+    return numbers;
   }
 
   /** conver output of neural net into game input */

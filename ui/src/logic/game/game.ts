@@ -200,6 +200,7 @@ export class Game {
     const alivePlayers = gameState.players.map((p, i) => ({ p, i })).filter(({ p: { health } }) => health > 0);
 
     deadPlayers.forEach((x) => {
+      x.p.health = 0;
       World.remove(world, x.p.body);
     });
 

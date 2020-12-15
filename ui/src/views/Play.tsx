@@ -24,7 +24,7 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
 
   const init = () => {
     setTimeout(() => {
-      _init();
+      // _init();
     }, (2000));
   }
 
@@ -49,9 +49,9 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
           }
         }
       },
-      games: 4,
+      games: 2,
       gameSettings: Game.SETTINGS_DEFAULT,
-      nnInit: { hiddenLayers: [20, 10], },
+      nnInit: { hiddenLayers: [5], },
     }, () => {
       console.log("game ended");
     });
