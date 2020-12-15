@@ -39,7 +39,7 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
         sensors: Game.SETTINGS_DEFAULT.ai.sensorSidesArrayAngle,
       },
       gaInit: {
-        popSize: 20,
+        popSize: 5,
         proccessFunction: {
           breedingParents: 1,
           mutationRate: .01,
@@ -56,7 +56,7 @@ const Renderer: React.FC<TRendererProps> = ({ height, width }) => {
       console.log("game ended");
     });
 
-    range(20).forEach(x => {
+    range(0).forEach(x => {
       console.log(`generation ${x} best: ${gameAi.gann.ga.population[0].fitness}`);
       gameAi.next(() => {
         console.log("game ended");

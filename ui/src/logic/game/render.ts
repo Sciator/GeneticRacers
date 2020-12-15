@@ -40,7 +40,7 @@ export const gameRender = async (props: GameRenderProps) => {
     } as any,
   });
 
-  Render.run(render);
+  // Render.run(render);
 
   // fit the render viewport to the scene
   (Render as any).lookAt(render, {

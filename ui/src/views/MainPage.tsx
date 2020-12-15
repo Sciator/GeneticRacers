@@ -19,20 +19,22 @@ export const MainPage: React.FC<TMainPageProps> = () => {
   return <>
     <Card>
       <Row gutter={[8, 0]}>
-        <Col xxl={8}>
+        {/* <Col xxl={8}>
           <Settings {...{aiSettings, setAiSettings}} />
-        </Col>
-        <Col xxl={8}>
+        </Col> */}
+        {/* <Col xxl={8}> */}
+        <Col sm={8}>
           <Row gutter={[0, 8]}>
-            <Col xxl={24}>
+            <Col sm={24}>
               <RunAI />
             </Col>
-            <Col xxl={24}>
+            <Col sm={24}>
               <PlayPage />
             </Col>
           </Row>
         </Col>
-        <Col xxl={8}>
+        {/* </Col> */}
+        {/* <Col xxl={8}>
           <Row gutter={[0, 8]} >
             <Col xxl={24}>
               <Analyze />
@@ -41,7 +43,7 @@ export const MainPage: React.FC<TMainPageProps> = () => {
               <History />
             </Col>
           </Row>
-        </Col>
+        </Col> */}
       </Row>
     </Card>
   </>;
