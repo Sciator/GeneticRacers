@@ -6,8 +6,10 @@ import { Settings, TSettingState } from "./Settings";
 import { History } from "./History";
 import { RunAI } from "./RunAI";
 import { GameAI } from "../logic/gameAi/GameAi";
+import { GameAiEval } from "../logic/gameAi/GameAiEval";
+import { NeuralNet } from "../logic/ai/nn/nn";
 
-const {defaultInitParams} = GameAI;
+const { defaultInitParams } = GameAI;
 
 type TMainPageProps = {
 
@@ -15,6 +17,7 @@ type TMainPageProps = {
 
 export const MainPage: React.FC<TMainPageProps> = () => {
   const [aiSettings, setAiSettings] = useState<TSettingState>(defaultInitParams as any);
+  const [snapshot, setSnapshot] = useState<NeuralNet[] | undefined>(undefined);
 
   return <>
     <Card>
@@ -24,14 +27,14 @@ export const MainPage: React.FC<TMainPageProps> = () => {
         </Col> */}
         {/* <Col xxl={8}> */}
         {/* <Col sm={8}> */}
-          <Row gutter={[8, 8]}>
-            <Col sm={8}>
-              <RunAI />
-            </Col>
-            <Col sm={16}>
-              <PlayPage />
-            </Col>
-          </Row>
+        <Row gutter={[8, 8]}>
+          <Col sm={8}>
+            <RunAI onSnapshot={(e) => setSnapshot(e)} />
+          </Col>
+          <Col sm={16}>
+            <PlayPage snapshot={snapshot} />
+          </Col>
+        </Row>
         {/* </Col> */}
         {/* </Col> */}
         {/* <Col xxl={8}>

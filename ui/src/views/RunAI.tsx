@@ -2,9 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Card, Row, Progress, Button, Col } from "antd";
 import { randInt, range } from "../core/common";
 import { Bot, GameAiLiveTrain } from "../logic/gameAi/GameAiLiveTrain";
+import { GameAiEval } from "../logic/gameAi/GameAiEval";
+import { Game } from "../logic/game/game";
+import { NeuralNet } from "../logic/ai/nn/nn";
 
 type TRunProps = {
-
+  onSnapshot?: (evaler: NeuralNet[]) => void,
 };
 
 // todo: every progress show different target
@@ -70,17 +73,13 @@ const fakeSnapshot: BotSnapshot = {
   })), popsize: 100
 };
 
-export const RunAI: React.FC<TRunProps> = ({ }) => {
+export const RunAI: React.FC<TRunProps> = ({ onSnapshot }) => {
   const [running, setRunning] = useState(false);
   const aiLiveRef = useRef(new GameAiLiveTrain({ hiddens: [10, 5] }, {}));
   const botSnapshotRef = useRef<BotSnapshot>(fakeSnapshot);
   const calculationsDoneRef = useRef(0);
 
   const stepsTime = useRef(1_000);
-
-  // useEffect(()=>{
-  //   aiLive.bots.splice(100);
-  // },[]);
 
   const start = () => {
     setRunning(true);
@@ -96,16 +95,17 @@ export const RunAI: React.FC<TRunProps> = ({ }) => {
 
     const t1 = Date.now();
     for (let i = steps; i--;) {
-      calculationsDoneRef.current++;
       aiLiveRef.current.next();
     }
+    calculationsDoneRef.current += steps;
     const delta = Date.now() - t1;
     stepsTime.current = delta / steps;
 
     // console.log(`steps ${steps} current ${delta} target ${targetDeltaTime.toFixed(0)}`);
 
     if (lastUpdate + targetDeltaTime < Date.now()) {
-      botSnapshotRef.current = createBotSnapshot(aiLiveRef.current.bots, 20);
+      const snapshot = botSnapshotRef.current = createBotSnapshot(aiLiveRef.current.bots, 20);
+      onSnapshot?.(snapshot.bots.slice(0, 2).map(x => x.nn));
     };
 
     setTimeout(() => {

@@ -41,7 +41,7 @@ export type GameInput = {
 
 
 export enum EGameStateObjectType {
-  player, bullet
+  player, bullet, wall
 }
 
 export type GameStateObject = {
@@ -72,6 +72,7 @@ export type GameStateBullet = GameStateObject & {
 };
 
 export type GameState = {
+  walls: GameStateObject[],
   players: GameStatePlayer[],
   bullets: GameStateBullet[],
   /** index of game winner, if -1 game isn't over yet -2 if game is draw */
@@ -104,10 +105,11 @@ export class Game {
 
   /** returns game state object from body ID */
   private getObjFromId(id: number): GameStateObject | undefined {
-    const { bullets, players } = this.gameState;
+    const { bullets, players, walls } = this.gameState;
     const find = (arr: GameStateObject[]) => arr.find(x => x.body.id === id);
     const player = find(players); if (player) return player;
     const bullet = find(bullets); if (bullet) return bullet;
+    const wall = find(walls); if (wall) return wall;
   }
 
 
@@ -329,6 +331,7 @@ export class Game {
     World.add(world, players);
 
     this.gameState = {
+      walls: walls.map(x=>({body:x, health:Infinity, type:EGameStateObjectType.wall})),
       players: players.map((body) =>
       ({
         type: EGameStateObjectType.player,

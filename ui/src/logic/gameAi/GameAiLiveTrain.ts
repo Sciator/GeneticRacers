@@ -59,11 +59,11 @@ export class GameAiLiveTrain {
     const evaler = new GameAiEval(selected.map(x => x.nn), Game.SETTINGS_DEFAULT);
 
     const startingHealths = selected.map(x => {
-      x.health -= 1;
+      x.health -= 1 / healthMultiplier;
       if (x.health >= 0)
         return 1;
 
-      const minus = x.health;
+      const minus = x.health * healthMultiplier;
       x.health = 0;
       return 1 + minus;
     });
@@ -75,10 +75,10 @@ export class GameAiLiveTrain {
     const resHealth = evaler.game.gameState.players.map(x => x.health);
     resHealth.forEach((x, i) => {
       const bot = selected[i];
-      bot.health += x;
-      if (x > 0) bot.health += this.params.healthGrowAfterGame;
+      bot.health += x / healthMultiplier;
+      if (x > 0) bot.health += healthGrowAfterGame/healthMultiplier;
 
-      const exceedingHealth = bot.health - this.params.healthMultiplier;
+      const exceedingHealth = (bot.health - healthMultiplier)*healthMultiplier;
       if (exceedingHealth > 0) {
         bot.health = this.params.healthMultiplier;
         const bonusMultiplier =

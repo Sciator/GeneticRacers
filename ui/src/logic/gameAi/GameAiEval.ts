@@ -19,10 +19,13 @@ const numFromType = (type: EGameStateObjectType | "none" | "unknown") => {
   switch (type) {
     case "none":
       return 1;
-    case EGameStateObjectType.player:
+    case EGameStateObjectType.wall:
       return 2;
-    case EGameStateObjectType.bullet:
+    case EGameStateObjectType.player:
       return 3;
+    case EGameStateObjectType.bullet:
+      return 4;
+
     case "unknown":
       return 4;
 
@@ -79,7 +82,7 @@ export class GameAiEval {
   /** conver output of neural net into game input */
   private inputFromNN(numbers: number[]): GameInputPlayer {
     return {
-      rotate: numbers[0],
+      rotate: numbers[0] * 2 - 1,
       use: numbers[1] >= .5,
       walk: numbers[2] >= .5,
       switch: numbers[3],
