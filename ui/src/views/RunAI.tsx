@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Card, Row, Progress, Button, Col } from "antd";
 import { randInt, range } from "../core/common";
 import { Bot, GameAiLiveTrain } from "../logic/gameAi/GameAiLiveTrain";
-import { GameAiEval } from "../logic/gameAi/GameAiEval";
-import { Game } from "../logic/game/game";
 import { NeuralNet } from "../logic/ai/nn/nn";
 
 type TRunProps = {
@@ -19,7 +17,7 @@ const targetDeltaTime = 1_000 / fps;
 type BotSnapshot = { bots: Bot[], popsize: number };
 const createBotSnapshot = (bots: Bot[], samples: number): BotSnapshot => {
   return { bots: bots.slice(0, samples).map(x => ({ ...x })), popsize: bots.length };
-}
+};
 
 
 const BotData = ({ popsize, bots, calculations }: BotSnapshot & { calculations: number }) => <>
@@ -55,7 +53,7 @@ const BotData = ({ popsize, bots, calculations }: BotSnapshot & { calculations: 
               </Col>
             </Row>
           </Card>
-        </Col>
+        </Col>;
       }
       )
     }
@@ -70,7 +68,7 @@ const fakeSnapshot: BotSnapshot = {
     games: randInt(1000),
     lastGame: randInt(1000),
     nn: undefined as any,
-  })), popsize: 100
+  })), popsize: 100,
 };
 
 export const RunAI: React.FC<TRunProps> = ({ onSnapshot }) => {
@@ -106,12 +104,12 @@ export const RunAI: React.FC<TRunProps> = ({ onSnapshot }) => {
     if (lastUpdate + targetDeltaTime < Date.now()) {
       const snapshot = botSnapshotRef.current = createBotSnapshot(aiLiveRef.current.bots, 20);
       onSnapshot?.(snapshot.bots.slice(0, 2).map(x => x.nn));
-    };
+    }
 
     setTimeout(() => {
       setLastUpdate(Date.now());
-    })
-  }, [lastUpdate, setLastUpdate, running])
+    });
+  }, [lastUpdate, setLastUpdate, running, onSnapshot]);
 
 
   const button = running

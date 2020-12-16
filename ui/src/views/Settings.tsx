@@ -6,7 +6,7 @@ import { produce } from "immer";
 import { GameAI, GameAIInitParams } from "../logic/gameAi/GameAi";
 import { IASelectionFunctionType } from "../logic/ai/ga/gaProcesGenerationFunction";
 
-export type TSettingState = GameAIInitParams
+export type TSettingState = GameAIInitParams;
 
 type TSettingsProps = {
   aiSettings: TSettingState,
@@ -17,7 +17,7 @@ export const Settings: FC<TSettingsProps> = (props) => {
   const { aiSettings, setAiSettings } = props;
   const {
     gaInit: { popSize },
-    nnInit: { }
+    nnInit: { },
   } = aiSettings;
 
   return <>
@@ -33,7 +33,7 @@ export const Settings: FC<TSettingsProps> = (props) => {
         <Form.Item label="Population size">
           <Input
             value={popSize}
-            onChange={e => setAiSettings(produce(aiSettings, x => { x.gaInit.popSize = +e.target.value }))}
+            onChange={e => setAiSettings(produce(aiSettings, x => { x.gaInit.popSize = +e.target.value; }))}
           ></Input>
         </Form.Item>
         <Form.Item label="Parents">

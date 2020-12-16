@@ -33,10 +33,10 @@ const numFromType = (type: EGameStateObjectType | "none" | "unknown") => {
       console.warn("unknown type of sensor");
       return -1;
   }
-}
+};
 
 /** distance of two vecotrs */
-const dist = (vec1: Vector, vec2: Vector) => Vector.magnitude(Vector.add(vec1, Vector.neg(vec2)))
+const dist = (vec1: Vector, vec2: Vector) => Vector.magnitude(Vector.add(vec1, Vector.neg(vec2)));
 
 /**
  * class for evaling game with bots
@@ -61,7 +61,7 @@ export class GameAiEval {
     const outputs = GameAiEval.NN_OUTPUTS;
     const inputs = GameAiEval.NN_INPUTS_GET({ sensors });
     return NeuralNet.create({
-      layerScheme: { hiddens, inputs, outputs }, afunction
+      layerScheme: { hiddens, inputs, outputs }, afunction,
     });
   }
 
@@ -86,13 +86,13 @@ export class GameAiEval {
       use: numbers[1] >= .5,
       walk: numbers[2] >= .5,
       switch: numbers[3],
-    }
+    };
   }
 
   /** Calculates all turns until all done */
   public run() {
     while (!this.done) {
-      this.next()
+      this.next();
     }
   }
 

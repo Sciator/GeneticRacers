@@ -1,4 +1,4 @@
-import { Engine, World, Bodies, Vector, Composite, Body, Events } from "matter-js";
+import { Engine, World, Bodies, Vector, Body, Events } from "matter-js";
 import { throwReturn } from "../../core/common";
 import { GameAI } from "../gameAi/GameAi";
 import { createSensorExecutor, SensorExecutor } from "./sensors";
@@ -41,7 +41,7 @@ export type GameInput = {
 
 
 export enum EGameStateObjectType {
-  player, bullet, wall
+  player, bullet, wall,
 }
 
 export type GameStateObject = {
@@ -49,7 +49,7 @@ export type GameStateObject = {
   body: Body,
   type: EGameStateObjectType,
   health: number,
-}
+};
 
 export type GameStatePlayer = GameStateObject & {
   type: EGameStateObjectType.player,
@@ -176,11 +176,11 @@ export class Game {
         let vec = Vector.rotate(Vector.create(1, 0), body.angle);
         vec = Vector.mult(vec, 5);
         Body.setVelocity(body, vec);
-        player.health -= .0005
+        player.health -= .0005;
       }
       if (x.rotate !== 0) {
         Body.setAngularVelocity(body, x.rotate * .3);
-        player.health -= Math.abs(x.rotate) * .005
+        player.health -= Math.abs(x.rotate) * .005;
       }
       if (x.use) {
         this.use(player);
@@ -211,14 +211,14 @@ export class Game {
     } else if (alivePlayers.length === 0) {
       this.gameState.winner = -2;
     }
-  };
+  }
 
   private processBullets() {
     const { gameState: { bullets } } = this;
     // todo: based on current step delta
-    bullets.forEach(x => { x.health -= .01 });
+    bullets.forEach(x => { x.health -= .01; });
 
-    bullets.map(x => {
+    bullets.forEach(x => {
       const { body, health } = x;
       const { speed, velocity } = body;
 
@@ -233,12 +233,14 @@ export class Game {
     const bulletSize = 5;
     const itemCooldown = 2000;
 
-    // todo: check ammo 
+    // todo: check ammo
     const { body: { position, angle }, item } = player;
     const { gameState: { bullets }, settings: { game: { playerSize } } } = this;
 
-    if (item.cooldown !== 0)
+    if (item.cooldown !== 0){
+      player.health -= .2;
       return;
+    }
     item.cooldown = itemCooldown;
 
     const distance = playerSize + bulletSize + 1;
@@ -257,9 +259,7 @@ export class Game {
       type: EGameStateObjectType.bullet,
       health: 1,
       body,
-    })
-
-    player.health -= .1;
+    });
   }
 
   // todo: move all sensor related things into GameAI folder
@@ -294,17 +294,17 @@ export class Game {
           player.health -= damage;
           bullet.health -= damage;
         } else if (objects[1].type === EGameStateObjectType.bullet) {
-          objects.forEach(x => x.health /= 2)
+          objects.forEach(x => x.health /= 2);
         }
       }
-    }
+    };
 
     pairs.forEach(processColisionPair);
   }
 
   constructor(userSettings: Partial<GameSettings> = {}) {
     const settings = this.settings = mergeSettings(Game.SETTINGS_DEFAULT, userSettings);
-    // create engine (as any for ignoring deprecated warning 
+    // create engine (as any for ignoring deprecated warning
     //    - no other function to create engine known)
     this.engine = (Engine as any).create();
     const world = this.world;
@@ -345,7 +345,7 @@ export class Game {
       timeRemaining: settings.game.maxGameLength,
     };
 
-    Events.on(this.engine, "collisionStart", this.onCollision.bind(this))
+    Events.on(this.engine, "collisionStart", this.onCollision.bind(this));
 
     this.sensorExecutor = createSensorExecutor(this);
   }

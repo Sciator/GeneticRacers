@@ -23,6 +23,7 @@ export const PlayPage: React.FC<TRunnerProps> = ({ capture, snapshot }) => {
   const ref = useRef<HTMLDivElement>(undefined as any);
   const [renderer, setRenderer] = useState<Render | undefined>(undefined);
   const setRunning = runningState[1];
+  const running = runningState[0];
 
   const canStart = !(runningState[0] || !snapshot);
 
@@ -30,22 +31,24 @@ export const PlayPage: React.FC<TRunnerProps> = ({ capture, snapshot }) => {
     if (!canStart) return;
     setRunning(true);
     setEvaler(new GameAiEval(snapshot!, Game.SETTINGS_DEFAULT));
-  }
+  };
 
   const stop = () => {
     setRunning(false);
-  }
+  };
+
+
 
   useEffect(() => {
-    if (runningState[0]) return;
+    if (running) return;
     if (renderer)
-      Render.stop(renderer)
+      Render.stop(renderer);
     setRenderer(undefined);
     if (ref.current) ref.current.innerHTML = "";
-  }, [renderer, runningState[0]])
+  }, [renderer, running]);
 
   useEffect(() => {
-    if (!ref.current || !evaler || !runningState[0]) return;
+    if (!ref.current || !evaler || !running) return;
     // if (!ref.current) return;
     const element = ref.current;
 
@@ -115,7 +118,7 @@ export const PlayPage: React.FC<TRunnerProps> = ({ capture, snapshot }) => {
     const rafLoop = () => {
       step();
       if (!game.isGameOver) {
-        // if ([runningState[0]])
+        if (running)
         requestAnimationFrame(rafLoop);
       } else {
 
@@ -126,7 +129,7 @@ export const PlayPage: React.FC<TRunnerProps> = ({ capture, snapshot }) => {
     requestAnimationFrame(rafLoop);
 
     Render.run(render);
-  }, [evaler])
+  }, [evaler, running]);
 
   const button = runningState[0]
     ? <Button onClick={stop}>Stop</Button>

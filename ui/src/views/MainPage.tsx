@@ -1,22 +1,22 @@
 import { Card, Row, Col } from "antd";
 import React, { useState } from "react";
-import { Analyze } from "./Analyze";
 import { PlayPage } from "./Play";
-import { Settings, TSettingState } from "./Settings";
-import { History } from "./History";
 import { RunAI } from "./RunAI";
-import { GameAI } from "../logic/gameAi/GameAi";
-import { GameAiEval } from "../logic/gameAi/GameAiEval";
 import { NeuralNet } from "../logic/ai/nn/nn";
+// import { GameAI } from "../logic/gameAi/GameAi";
+// import { Analyze } from "./Analyze";
+// import { Settings, TSettingState } from "./Settings";
+// import { History } from "./History";
+// import { GameAiEval } from "../logic/gameAi/GameAiEval";
 
-const { defaultInitParams } = GameAI;
+// const { defaultInitParams } = GameAI;
 
 type TMainPageProps = {
 
 };
 
 export const MainPage: React.FC<TMainPageProps> = () => {
-  const [aiSettings, setAiSettings] = useState<TSettingState>(defaultInitParams as any);
+  // const [aiSettings, setAiSettings] = useState<TSettingState>(defaultInitParams as any);
   const [snapshot, setSnapshot] = useState<NeuralNet[] | undefined>(undefined);
 
   return <>

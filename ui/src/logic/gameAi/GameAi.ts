@@ -3,7 +3,7 @@ import { IAProcessGenerationFunction, IASelectionFunctionType } from "../ai/ga/g
 import { GeneticAlgorithmNeuralNet } from "../ai/gann/gann";
 import { NeuralNet } from "../ai/nn/nn";
 import { IANNActivationFunction } from "../ai/nn/nnActivationFunctions";
-import { Game, GameSettings } from "../game/game";
+import { GameSettings } from "../game/game";
 import { GameAiEval } from "./GameAiEval";
 
 
@@ -27,7 +27,7 @@ export type GameAIInitParams = {
     /** sensor angles from center to both side (in radians) */
     sensors: number[]
   }
-}
+};
 
 /**
  * class for training game bots
@@ -47,8 +47,8 @@ export class GameAI {
         selection: {
           type: IASelectionFunctionType.percent,
           value: 10,
-        }
-      }
+        },
+      },
     },
     nnInit: {
       hiddenLayers: [8, 8, 8],
@@ -57,7 +57,7 @@ export class GameAI {
     aiParams: {
       sensors: [Math.PI * 1 / 4, Math.PI * 1 / 8, Math.PI * 1 / 32],
     },
-  }
+  };
 
   private onGameEnd: (() => void) | undefined = undefined;
 
@@ -80,7 +80,7 @@ export class GameAI {
           queue.pop()!,
           queue.pop()
           // create fake player if second not present so it's dna score will not be affected
-          ?? { dna: dnas[randInt(dnas.length)], games: 0, wins: 0 }
+          ?? { dna: dnas[randInt(dnas.length)], games: 0, wins: 0 },
         ];
         players.forEach(p => { p.games++; });
 
@@ -88,7 +88,7 @@ export class GameAI {
         evaler.run();
         const winner = evaler.game.gameState.winner;
         if (winner >= 0) {
-          players.forEach(x => x.wins--)
+          players.forEach(x => x.wins--);
           players[winner].wins += 20;
         } else {
           players.forEach(x => x.wins -= 0.5);
@@ -125,7 +125,7 @@ export class GameAI {
           inputs,
           hiddens: ai.nnInit.hiddenLayers,
           outputs,
-        }
+        },
       },
       _environment: { _environmentBatch },
     });

@@ -7,7 +7,7 @@ import { GameAiEval } from "./GameAiEval";
 
 export type GameAiLiveTrainConst = {
   hiddens: number[],
-}
+};
 
 export type Bot = {
   health: number,
@@ -28,7 +28,7 @@ export class GameAiLiveTrain {
     /** how many hp will player get after game when survives */
     healthGrowAfterGame: .2,
     sensors: [Math.PI * 1 / 4, Math.PI * 1 / 8, Math.PI * 1 / 32],
-  }
+  };
 
   public bots: Bot[];
 
@@ -45,7 +45,7 @@ export class GameAiLiveTrain {
 
   /** calculate next ai steps. increment last of all bots -> select two bots and play with them -> create new bots from maxed up bots */
   public next() {
-    const { healthGrowAfterGame, healthMultiplier, maxPop, sensors } = this.params;
+    const { healthGrowAfterGame, healthMultiplier, maxPop } = this.params;
     const { bots } = this;
     bots.sort((a, b) => - a.games + b.games + (- a.wins + b.wins) * 1_000);
 
@@ -94,10 +94,10 @@ export class GameAiLiveTrain {
 
         bot.bonus += exceedingHealth * bonusMultiplier;
       }
-    })
+    });
 
     if (resHealth.some(x => x <= 0))
-      resHealth.forEach((x, i) => { if (x > 0) selected[i].wins++; })
+      resHealth.forEach((x, i) => { if (x > 0) selected[i].wins++; });
 
     selected.forEach(x => { x.lastGame = 0; x.games++; });
 
@@ -126,7 +126,7 @@ export class GameAiLiveTrain {
 
       console.log("new bot created");
       bot.bonus--;
-      bots.push({ bonus: 0, games: 0, wins: 0, health: this.params.healthMultiplier, lastGame: 0, nn: bot.nn.mutate(.01) })
+      bots.push({ bonus: 0, games: 0, wins: 0, health: this.params.healthMultiplier, lastGame: 0, nn: bot.nn.mutate(.01) });
     }
   }
 
@@ -134,9 +134,9 @@ export class GameAiLiveTrain {
   constructor(constructorParams: GameAiLiveTrainConst, paramsOveride: Partial<GameAiLiveTrain["params"]>) {
     const params = this.params = { ...this.params, ...paramsOveride };
     const { hiddens } = constructorParams;
-    const { healthGrowAfterGame, healthMultiplier, maxPop, sensors } = params;
+    const { sensors } = params;
 
-    this.bots = range(params.maxPop).map(x => ({
+    this.bots = range(params.maxPop).map(() => ({
       bonus: 0,
       health: params.healthMultiplier,
       games: 0,
