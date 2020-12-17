@@ -16,7 +16,7 @@ const targetDeltaTime = 1_000 / fps;
 
 type BotSnapshot = { bots: Bot[], popsize: number };
 const createBotSnapshot = (bots: Bot[], samples: number): BotSnapshot => {
-  return { bots: bots.slice(0, samples).map(x => ({ ...x })), popsize: bots.length };
+  return { bots: bots.slice(0, samples).map(x => ({ ...x, predecessors: x.predecessors.slice() })), popsize: bots.length };
 };
 
 
@@ -28,11 +28,14 @@ const BotData = ({ popsize, bots, calculations }: BotSnapshot & { calculations: 
   </Row>
   <Row gutter={[0, 12]}>
     {
-      bots.map(({ bonus, games, health, lastGame, wins }) => {
+      bots.map(({ bonus, games, health, lastGame, wins, children, predecessors }) => {
         return <Col sm={24}>
           <Card>
             <Row>
               <Col sm={18}>
+                <Row>
+                  {predecessors.map(x => x.toString(16).padStart(4, "0")).join("-")}
+                </Row>
                 <Row>
                   <Progress percent={bonus * 100} status={"active"} strokeColor={"#f4f711"} format={() => ""}></Progress>
                 </Row>
@@ -43,13 +46,16 @@ const BotData = ({ popsize, bots, calculations }: BotSnapshot & { calculations: 
               <Col sm={6}>
                 <Row>
                   {games.toLocaleString().padStart(5, " ")} : Games
-            </Row>
+                </Row>
                 <Row>
                   {wins.toLocaleString().padStart(5, " ")} : Wins
-            </Row>
+                </Row>
+                <Row>
+                  {children.toLocaleString().padStart(5, " ")} : children
+                </Row>
                 <Row>
                   {lastGame.toLocaleString().padStart(5, " ")} : last
-            </Row>
+                </Row>
               </Col>
             </Row>
           </Card>
@@ -68,6 +74,8 @@ const fakeSnapshot: BotSnapshot = {
     games: randInt(1000),
     lastGame: randInt(1000),
     nn: undefined as any,
+    children: randInt(1000),
+    predecessors: range(randInt(1, 5)).map(() => randInt(100)),
   })), popsize: 100,
 };
 
@@ -108,7 +116,7 @@ export const RunAI: React.FC<TRunProps> = ({ onSnapshot }) => {
 
     setTimeout(() => {
       setLastUpdate(Date.now());
-    });
+    }, 15);
   }, [lastUpdate, setLastUpdate, running, onSnapshot]);
 
 

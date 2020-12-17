@@ -14,7 +14,7 @@ export type GameSettings = {
   },
   game: {
     playerSize: number,
-    maxGameLength: number,
+    // maxGameLength: number,
   },
   map: {
     size: number,
@@ -77,7 +77,7 @@ export type GameState = {
   bullets: GameStateBullet[],
   /** index of game winner, if -1 game isn't over yet -2 if game is draw */
   winner: number,
-  timeRemaining: number,
+  // timeRemaining: number,
 };
 
 export type SensorPoint = { point: Vector, type: "none" | "unknown" | EGameStateObjectType };
@@ -125,7 +125,7 @@ export class Game {
     },
     game: {
       playerSize: 10,
-      maxGameLength: 10_000,
+      // maxGameLength: 10_000,
     },
     simulation: {
       delta: 32,
@@ -142,11 +142,14 @@ export class Game {
     this.applyInput(userInput);
 
     const delta = deltaOveride || deltaSettings;
-    this.gameState.timeRemaining -= delta;
+    // this.gameState.timeRemaining -= delta;
 
-    if (this.gameState.timeRemaining <= 0) {
-      players.forEach(x => x.health = 0);
-    }
+    // if (this.gameState.timeRemaining <= 0) {
+    //   players.forEach(x => x.health = 0);
+    // }
+
+    players.forEach(x => { x.health -= .002; });
+
 
     Engine.update(engine, delta);
 
@@ -176,11 +179,9 @@ export class Game {
         let vec = Vector.rotate(Vector.create(1, 0), body.angle);
         vec = Vector.mult(vec, 5);
         Body.setVelocity(body, vec);
-        player.health -= .0005;
       }
       if (x.rotate !== 0) {
         Body.setAngularVelocity(body, x.rotate * .3);
-        player.health -= Math.abs(x.rotate) * .005;
       }
       if (x.use) {
         this.use(player);
@@ -206,9 +207,10 @@ export class Game {
       World.remove(world, x.p.body);
     });
 
-    if (alivePlayers.length === 1) {
+    if (alivePlayers.length === 1 && alivePlayers[0].p.health >= .05) {
       this.gameState.winner = alivePlayers[0].i;
     } else if (alivePlayers.length === 0) {
+      deadPlayers.forEach(x => x.p.health = 0);
       this.gameState.winner = -2;
     }
   }
@@ -237,8 +239,8 @@ export class Game {
     const { body: { position, angle }, item } = player;
     const { gameState: { bullets }, settings: { game: { playerSize } } } = this;
 
-    if (item.cooldown !== 0){
-      player.health -= .2;
+    if (item.cooldown !== 0) {
+      // player.health -= .2;
       return;
     }
     item.cooldown = itemCooldown;
@@ -260,6 +262,7 @@ export class Game {
       health: 1,
       body,
     });
+    // player.health -= .1;
   }
 
   // todo: move all sensor related things into GameAI folder
@@ -331,7 +334,7 @@ export class Game {
     World.add(world, players);
 
     this.gameState = {
-      walls: walls.map(x=>({body:x, health:Infinity, type:EGameStateObjectType.wall})),
+      walls: walls.map(x => ({ body: x, health: Infinity, type: EGameStateObjectType.wall })),
       players: players.map((body) =>
       ({
         type: EGameStateObjectType.player,
@@ -342,7 +345,7 @@ export class Game {
       ),
       bullets: [],
       winner: -1,
-      timeRemaining: settings.game.maxGameLength,
+      // timeRemaining: settings.game.maxGameLength,
     };
 
     Events.on(this.engine, "collisionStart", this.onCollision.bind(this));

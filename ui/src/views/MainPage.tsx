@@ -1,5 +1,5 @@
 import { Card, Row, Col } from "antd";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { PlayPage } from "./Play";
 import { RunAI } from "./RunAI";
 import { NeuralNet } from "../logic/ai/nn/nn";
@@ -19,6 +19,8 @@ export const MainPage: React.FC<TMainPageProps> = () => {
   // const [aiSettings, setAiSettings] = useState<TSettingState>(defaultInitParams as any);
   const [snapshot, setSnapshot] = useState<NeuralNet[] | undefined>(undefined);
 
+  const callback = useCallback((e: NeuralNet[]) => setSnapshot(e), []);
+
   return <>
     <Card>
       <Row gutter={[8, 0]}>
@@ -29,7 +31,7 @@ export const MainPage: React.FC<TMainPageProps> = () => {
         {/* <Col sm={8}> */}
         <Row gutter={[8, 8]}>
           <Col sm={8}>
-            <RunAI onSnapshot={(e) => setSnapshot(e)} />
+            <RunAI onSnapshot={callback} />
           </Col>
           <Col sm={16}>
             <PlayPage snapshot={snapshot} />

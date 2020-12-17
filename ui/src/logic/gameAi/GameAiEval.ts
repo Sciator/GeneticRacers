@@ -1,6 +1,6 @@
 import { Vector } from "matter-js";
 import { IANNInitParams, NeuralNet } from "../ai/nn/nn";
-import { EGameStateObjectType, Game, GameInputPlayer, GameSettings, SensorPoint } from "../game/game";
+import { EGameStateObjectType, Game, GameInputPlayer, GameSettings, GameState, SensorPoint } from "../game/game";
 
 
 export type InitializeRandomBotParams = {
@@ -53,7 +53,9 @@ export class GameAiEval {
   public static NN_OUTPUTS = 4;
   /** returns number of nn inputs for given sensors array */
   public static NN_INPUTS_GET({ sensors }: { sensors: number[] | { length: number } }) {
-    return (sensors.length * 2 + 1) * 2;
+    return (sensors.length * 2 + 1) * 2
+      // health + cooldown
+      + 2;
   }
 
   public static initializeRandomBot(params: InitializeRandomBotParams): NeuralNet {
@@ -65,9 +67,9 @@ export class GameAiEval {
     });
   }
 
-  private sensorAsNumbers(playerIndex: number, points: SensorPoint[]): number[] {
+  private botInputs(playerIndex: number, points: SensorPoint[]): number[] {
     const { gameState: { players } } = this.game;
-    const { body: { position } } = players[playerIndex];
+    const { body: { position }, health, item: { cooldown } } = players[playerIndex];
 
     const numbers: number[] = [];
 
@@ -75,6 +77,8 @@ export class GameAiEval {
       const { point, type } = points[i];
       numbers.push(dist(point, position), numFromType(type));
     }
+
+    numbers.push(health, cooldown);
 
     return numbers;
   }
@@ -100,7 +104,7 @@ export class GameAiEval {
   public calculateBotResponse() {
     const { game } = this;
     const { gameState: { players } } = this.game;
-    const sensorsResults = players.map((_, i) => this.sensorAsNumbers(i, game.sensor(i)));
+    const sensorsResults = players.map((_, i) => this.botInputs(i, game.sensor(i)));
     const botsNNResults = sensorsResults.map((x, i) => this.playerNNs[i].predict(x));
     const botsActions = botsNNResults.map(x => this.inputFromNN(x));
 

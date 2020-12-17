@@ -16,6 +16,8 @@ export type Bot = {
   wins: number,
   lastGame: number,
   nn: NeuralNet,
+  children: number,
+  predecessors: number[],
 };
 
 
@@ -26,7 +28,7 @@ export class GameAiLiveTrain {
     /** for how many games has bot healths */
     healthMultiplier: 4,
     /** how many hp will player get after game when survives */
-    healthGrowAfterGame: .2,
+    healthGrowAfterGame: 1.4,
     sensors: [Math.PI * 1 / 4, Math.PI * 1 / 8, Math.PI * 1 / 32],
   };
 
@@ -36,7 +38,9 @@ export class GameAiLiveTrain {
     const bots = this.bots;
 
     const selectedIndex: number[] = math.pickRandom(
-      range(bots.length), 2, bots.map(x => Math.max(1, (x.lastGame - 1000) ** 3 - x.games + x.bonus + x.wins ** 2))
+      range(bots.length), 2, bots.map(x => Math.max(1,
+        ((1 - x.health) * 10) ** 2 + x.lastGame - x.games - x.bonus + (x.wins) ** 2
+      ))
     ) as any;
 
     const selected = selectedIndex.map(x => bots[x]);
@@ -75,10 +79,9 @@ export class GameAiLiveTrain {
     const resHealth = evaler.game.gameState.players.map(x => x.health);
     resHealth.forEach((x, i) => {
       const bot = selected[i];
-      bot.health += x / healthMultiplier;
-      if (x > 0) bot.health += healthGrowAfterGame/healthMultiplier;
+      bot.health += healthGrowAfterGame * x / healthMultiplier;
 
-      const exceedingHealth = (bot.health - healthMultiplier)*healthMultiplier;
+      const exceedingHealth = (bot.health - healthMultiplier) * healthMultiplier;
       if (exceedingHealth > 0) {
         bot.health = this.params.healthMultiplier;
         const bonusMultiplier =
@@ -101,8 +104,14 @@ export class GameAiLiveTrain {
 
     selected.forEach(x => { x.lastGame = 0; x.games++; });
 
-    if (populationToMaxFrac > .9) {
-      bots.map(x => x.bonus += .05);
+    if (populationToMaxFrac > .75) {
+      bots.forEach(x => {
+        x.bonus = Math.min(x.bonus * 5 + populationToMaxFrac, 2)
+      });
+    };
+
+    if (populationToMaxFrac > .8) {
+      bots.map(x => x.bonus += .01 * populationToMaxFrac);
     }
 
     if (bots.length < 10)
@@ -124,9 +133,11 @@ export class GameAiLiveTrain {
       const bot = bots[i];
       if (bot.bonus < 1) continue;
 
+      const ci = bot.children++;
+      const predecessors = bot.predecessors.concat(ci);
       console.log("new bot created");
       bot.bonus--;
-      bots.push({ bonus: 0, games: 0, wins: 0, health: this.params.healthMultiplier, lastGame: 0, nn: bot.nn.mutate(.01) });
+      bots.push({ bonus: 0, games: 0, wins: 0, health: 1, lastGame: 0, nn: bot.nn.mutate(.01), children: 0, predecessors });
     }
   }
 
@@ -136,13 +147,15 @@ export class GameAiLiveTrain {
     const { hiddens } = constructorParams;
     const { sensors } = params;
 
-    this.bots = range(params.maxPop).map(() => ({
+    this.bots = range(params.maxPop).map((i) => ({
       bonus: 0,
-      health: params.healthMultiplier,
+      health: 1,
       games: 0,
       wins: 0,
       lastGame: 0,
       nn: GameAiEval.initializeRandomBot({ hiddens, sensors }),
+      children: 0,
+      predecessors: [i],
     }));
   }
 }
