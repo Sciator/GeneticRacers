@@ -1,6 +1,6 @@
 import { Vector } from "matter-js";
 import { IANNInitParams, NeuralNet } from "../ai/nn/nn";
-import { EGameStateObjectType, Game, GameInputPlayer, GameSettings, GameState, SensorPoint } from "../game/game";
+import { EGameStateObjectType, Game, GameInputPlayer, GameSettings, SensorPoint } from "../game/game";
 
 
 export type InitializeRandomBotParams = {
