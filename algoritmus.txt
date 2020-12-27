@@ -1,5 +1,5 @@
-Evoluční algoritmus
--------------------
+Problematika trénování hry více botů
+------------------------------------
 
 Původní verze projektu byla hra jednoho hráče (závod s cílem dojet do cíle) využívající základní verzi genetického algoritmu. 
 Nová verze narozdíl od původní obsahuje hru více hráčů (duel, jednoduchá přestřelka) soupeřících proti sobě. 
@@ -39,14 +39,29 @@ Kroky algoritmu:
   5. Odstraň bota s 0 životy
   6. Pokud má nějaký bot maximum bonusového skóre, anuluje bonusové skóre a vytvoří mutovanou kopii bota
 
+Každý bot (element populace):
+- má životy a bonusové skóre
+- má počet výher, počet kroků od poslední hry a počet botů které byly podle něj zkopírované (chilren)
+- má identifikátor vytvořený z rodičovského bota (pouze orientační, na trénovaní nemá žádný vliv)
+- DNA neboli sadu vah neurální sítě kterou je bot řízený.
 
 Poznámka:
 Náhodný výběr obsahuje pevné hodnoty, které určují pravděpodobnost vybrání bota. Tyto hodnoty mohou být označené jako super parametry a ovlivňují charakteristiku učícího procesu. V projektu jsou určené na pevno, protože jejich změny mohou učení rozbít. 
 Nepovedlo se mi mezi nimi najít žádnou souvislost a jako dalši krok pro zlepšení tohoto algoritmu bych použil rozhodovací stromy abych určil závislosti mezi těmito super parametry a mohl tak jednodušeji najít parametry které by byly ideální.
 
 
-Hra
+Hra (Problém řešený algoritmem)
 ---
+
+Problém:
+Hledání bota s největší pravděpodobností výhry proti soupeřícímu botovi.
+
+Vstupy:
+Neurální síť bota, Neurální síť soupeřícícho bota
+
+Výstup:
+Který bot vyhrál.
+
 
 Každý bot:
 - začíná v rohu mapy
@@ -62,3 +77,11 @@ Vstupy neurální sítě jsou:
 - senzory
 - Životy bota
 - čas do dalšího možného výstřelu
+
+
+Závěr / výsledky
+----------------
+
+Po nějaké době trénování (asi 30 000 kroků) se umí nejlepší bot vyhýbat střelám soupeřícího bota, štřílet přesně na néj a v některých případech i střílet na soupeřícícho bota s odrazem (výhodné - v přímé trajektorii může dojít ke kolizi se soupeřovým projektilem a netrefení cíle).
+Základní hra je velice jednoduchá a nenabízí moc možností, přesto byl trénovací algoritmus schopný najít různé strategie hraní hry, a tu která se jevila nejlepší zdokonalit. 
+Vlastní úprava algoritmu může být ale pouze řešením jen tohoto konkrétního problému a nemusí být univerzánlně použitelná, proto by pro univerzální použití vyzadovala ještě další analýzu, testování a úpravy.
