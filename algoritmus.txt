@@ -1,0 +1,64 @@
+Evoluční algoritmus
+-------------------
+
+Původní verze projektu byla hra jednoho hráče (závod s cílem dojet do cíle) využívající základní verzi genetického algoritmu. 
+Nová verze narozdíl od původní obsahuje hru více hráčů (duel, jednoduchá přestřelka) soupeřících proti sobě. 
+Trénování této verze ale nebylo úspěšné a místo toho aby byl vývoj fitness proměnné neklesající (při rostoucí generaci) došlo 
+v určitém bodu k oscilaci fitness proměnné mezi dvěmi hodnotami. 
+Tento problém byl s největší pravděpodobností zapříčiněn střídáním možných strategií botů, namísto zlepšování jednotlivých strategií.
+
+Vypozorované strategie jsou:
+ - defensivní - vyhíbání se střelám soupeře 
+ - agresivní - pokoušející se strefit soupeře za každou cenu
+
+V souvislosti s tímto problémem jsem se snažil najít strategie pro učení hry více hráčů, tak že do každé hry jde více než jedno dna a 
+hodnota fitness jednotlivích botů je zavísla na ostatních botech ve stejné generaci. 
+Po neúspěšném hledání řešení tohoto problému pomocí genetického algoritmu a neurálních sítí, jsem se rozhodl navrhnout a implementovat vlastní, upravenou verzi genetického algoritmu. 
+
+
+Algoritmus
+----------
+
+Oproti genetickému algoritmu se v této implementaci populace nachází jen v jedné generaci. Díky tomu, při vytvoření nového bota s mutací, je jednodušeji možné porovnat jeho zlepšení vůčí ostatním a zároveň tato evoluční strategie umožňuje nechat zapamatované 
+strategie pro soupeření s nejlepšími boty. Touto strategií se tedy jednodušeji udržují všechny potencionálně dobré strategie v jedné generaci i přes to, že se zezačátku nemusí jevit jako dobré. Zároveň když se nějaká strategie ukáže jako dobrá, tak máme tento odhad
+utvrzený tím, že bot soupeřil i s různými strategiemi proti kterým se taky osvědčil.
+
+Na začátku hry si bot vezme část svých živtů do hry a pokud na konci hry má alespoň nějaké životy, jsou tyto životy navýšeny. Tímto principem může vítězný bot mít po hře více životů než na začátku. 
+Pokud má bot více životů než je určené maximum, jsou tyto životy přesunuté do bonusového skóre, které je určené ke kopírovaní tohoto bota. 
+
+Pokud je populace velice nízká, dochází k umělému navyšování bonusového skóre, a tak k vitváření více kopií aktuálních botů. Naopak vysoká populace bonus skóre snižuje.
+
+Příprava algoritmu:
+  Vytvoř populaci o dané velikosti.
+
+Kroky algoritmu:
+  1. Vyber dva boty náhodně, kde boti mají větší šanci pro vybrání s vysokými hodnotami výher a kroků od poslední hry a dalších hodnot
+  2. Odehraj hru s vybranými boty
+  3. Aplikuj výsledky hry na stav botů - sníží/zvíší životy
+  4. Přesuň body zdraví přesahující maximum do bonusového skóre
+  5. Odstraň bota s 0 životy
+  6. Pokud má nějaký bot maximum bonusového skóre, anuluje bonusové skóre a vytvoří mutovanou kopii bota
+
+
+Poznámka:
+Náhodný výběr obsahuje pevné hodnoty, které určují pravděpodobnost vybrání bota. Tyto hodnoty mohou být označené jako super parametry a ovlivňují charakteristiku učícího procesu. V projektu jsou určené na pevno, protože jejich změny mohou učení rozbít. 
+Nepovedlo se mi mezi nimi najít žádnou souvislost a jako dalši krok pro zlepšení tohoto algoritmu bych použil rozhodovací stromy abych určil závislosti mezi těmito super parametry a mohl tak jednodušeji najít parametry které by byly ideální.
+
+
+Hra
+---
+
+Každý bot:
+- začíná v rohu mapy
+- po výstřelu nemůže nějaký čas střílet znova
+- může se otáčet
+- může jít dopředu
+- má senzory rozpoznávající vzdálenost a typ herních objeků
+- má životy
+
+životy všech botů během hry neustále klesají. Tímto se podměcuje agresivnější styl hraní hry a zároveň omezuje maximálni čas hry.
+
+Vstupy neurální sítě jsou:
+- senzory
+- Životy bota
+- čas do dalšího možného výstřelu
